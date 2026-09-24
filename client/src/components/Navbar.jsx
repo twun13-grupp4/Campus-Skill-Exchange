@@ -1,4 +1,4 @@
-import { AppBar, Container, Toolbar, Typography } from "@mui/material"
+import { AppBar, Button, Container, Toolbar, Typography } from "@mui/material"
 import { Link as RouterLink } from 'react-router-dom'
 
 function Navbar() {
@@ -22,7 +22,7 @@ function Navbar() {
                             fontWeight: 400,
                             letterSpacing: '-0.5px',
                             color: 'inherit',
-                            textDecoration: 'nonr',
+                            textDecoration: 'none',
                             borderRadius: 1,
                             '&:focus-visible': {
                                 outline: '2px solid #3949ab',
@@ -32,6 +32,21 @@ function Navbar() {
                     >
                         <strong>Campus</strong>SkillExchange
                     </Typography>
+
+                    <Button
+                       component={RouterLink}
+                       to="/login"
+                       variant="text"
+                       sx={{
+                        ml: 'auto',
+                        flexShrink: 0,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        color: '#3949ab'
+                       }}
+                    >
+                        Log in
+                    </Button>
                 </Toolbar>
             </Container>
         </AppBar>

@@ -1,14 +1,16 @@
 import { Container, CssBaseline, Typography } from '@mui/material'
+import Navbar from './components/Navbar'
 
 
 function App() {
   return (
     <>
       <CssBaseline />
+      <Navbar />
 
-      <Container component="main" maxWidth="lg" sx ={{ py: 4}}>
+      <Container component="main" maxWidth="lg" sx ={{ py: 4 }}>
         <Typography component="h1" variant="h4" gutterBottom>
-          <strong>Campus</strong>SkillExchange
+          Learn and share with your campus
         </Typography>
 
         <Typography component="p" variant="body1">

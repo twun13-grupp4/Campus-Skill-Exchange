@@ -1,26 +1,19 @@
-import { Container, CssBaseline, Typography } from '@mui/material'
+import { CssBaseline } from '@mui/material'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
-
+import HomePage from './pages/HomePage'
 
 function App() {
   return (
-    <>
-      <CssBaseline />
-      <Navbar />
+    <BrowserRouter>
+        <CssBaseline />
+        <Navbar />
 
-      <Container component="main" maxWidth="lg" sx ={{ py: 4 }}>
-        <Typography component="h1" variant="h4" gutterBottom>
-          Learn and share with your campus
-        </Typography>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+    </BrowserRouter>
 
-        <Typography component="p" variant="body1">
-          Ask questions, share your knowledge, and learn from other students
-        </Typography>
-      
-      </Container>
-    
-    </>
-    
   )
 }
 

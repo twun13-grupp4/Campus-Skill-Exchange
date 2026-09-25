@@ -1,4 +1,6 @@
-import { Container, Typography } from "@mui/material"
+import { Container, Stack, Typography } from "@mui/material"
+import mockQuestions from "../data/mockQuestions"
+import QuestionCard from "../components/QuestionCard"
 
 function HomePage() {
     return (
@@ -10,6 +12,11 @@ function HomePage() {
             <Typography component="p" variant="body1">
                Ask questions, share your knowledge, and learn from other students
             </Typography>
+
+            <Stack spacing={2} sx={{ mt : 4 }}>
+                {mockQuestions.map((question) => (<QuestionCard key={question._id} question={question}/>
+            ))}
+            </Stack>
       
         </Container>
     )

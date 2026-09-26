@@ -1,4 +1,4 @@
-import { AppBar, Button, Container, Toolbar, Typography } from "@mui/material"
+import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material"
 import { Link as RouterLink } from 'react-router-dom'
 
 function Navbar() {
@@ -33,20 +33,31 @@ function Navbar() {
                     >
                         <strong>Campus</strong>SkillExchange
                     </Typography>
+              
+                    <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
+                        {/* ml: 'auto' på boxen istället för på en enskild knapp, så hela gruppen skjuts åt höger */}
+                        <Button
+                        component={RouterLink}
+                        to="/ask"
+                        variant="text"
+                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                        >
+                            Ask a question
+                        </Button>
 
-                    <Button
-                       component={RouterLink}
-                       to="/login"
-                       variant="text"
-                       sx={{
-                        ml: 'auto',
-                        flexShrink: 0,
-                        textTransform: 'none',
-                        fontWeight: 600,
-                       }}
-                    >
-                        Log in
-                    </Button>
+                        <Button
+                        component={RouterLink}
+                        to="/login"
+                        variant="text"
+                        sx={{
+                            flexShrink: 0,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                        }}
+                        >
+                            Log in
+                        </Button>
+                    </Box>
                 </Toolbar>
             </Container>
         </AppBar>

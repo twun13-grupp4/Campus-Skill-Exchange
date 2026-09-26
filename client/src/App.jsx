@@ -1,23 +1,24 @@
 import { CssBaseline } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
-import QuestionDetailPage from './pages/QuestionDetailPage'
+import theme from './theme'
 
 function App() {
   return (
-    <BrowserRouter>
-        <CssBaseline />
-        <Navbar />
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+          <CssBaseline />
+          <Navbar />
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/question/:id" element={<QuestionDetailPage />} />
-        </Routes>
-    </BrowserRouter>
-
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 

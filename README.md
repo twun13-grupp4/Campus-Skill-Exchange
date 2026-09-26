@@ -20,6 +20,14 @@ npm run dev
 ```
 Runs at http://localhost:5173
 
+**Server**
+```bash
+cd server
+npm install
+npm run dev
+```
+Runs at http://localhost:3000
+
 ## Usage
 
 Assignment 1 uses static/mock data — no database connection required yet. Open the client URL above and browse the listing/detail views.

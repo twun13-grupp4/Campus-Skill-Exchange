@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import theme from './theme'
+import QuestionDetailPage from './pages/QuestionDetailPage'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/questions/:id" element={<QuestionDetailPage />} />
           </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -16,7 +16,8 @@ MERN app split into two separate projects:
 ```bash
 cd client
 npm install
-npm run dev
+npm run dev      # development
+npm run build    # production build (output in client/dist)
 ```
 Runs at http://localhost:5173
 

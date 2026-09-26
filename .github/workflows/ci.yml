@@ -7,17 +7,26 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [client, server]
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up environment
-        run: |
-          # add your environment setup here
-          # e.g. for Python: pip install -r requirements.txt
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.project }}/package-lock.json
 
-      - name: Run tests
-        run: |
-          # add your test command here
-          # e.g. pytest
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint

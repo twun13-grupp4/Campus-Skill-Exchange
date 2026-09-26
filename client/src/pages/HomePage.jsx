@@ -1,4 +1,4 @@
-import { Container, Stack, Typography } from "@mui/material"
+import { Container, Grid, Typography } from "@mui/material"
 import mockQuestions from "../data/mockQuestions"
 import QuestionCard from "../components/QuestionCard"
 
@@ -13,10 +13,13 @@ function HomePage() {
                Ask questions, share your knowledge, and learn from other students
             </Typography>
 
-            <Stack spacing={2} sx={{ mt : 4 }}>
-                {mockQuestions.map((question) => (<QuestionCard key={question._id} question={question}/>
-            ))}
-            </Stack>
+            <Grid container spacing={2} sx={{ mt: 4 }}>
+                {mockQuestions.map((question) => (
+                    <Grid key={question._id} size={12}>
+                        <QuestionCard question={question} />
+                    </Grid>
+                ))}
+            </Grid>
       
         </Container>
     )

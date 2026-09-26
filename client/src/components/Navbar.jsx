@@ -8,7 +8,7 @@ function Navbar() {
             elevation={0}
             sx={{
                 bgcolor: 'background.paper',
-                color: '#1e293b',
+                color: 'text.primary',
                 borderBottom: '1px solid #e2e8f0',
             }}
         >
@@ -25,7 +25,8 @@ function Navbar() {
                             textDecoration: 'none',
                             borderRadius: 1,
                             '&:focus-visible': {
-                                outline: '2px solid #3949ab',
+                                outline: '2px solid',
+                                outlineColor: 'primary.main',
                                 outlineOffset: '4px',
                             },
                         }}
@@ -42,7 +43,6 @@ function Navbar() {
                         flexShrink: 0,
                         textTransform: 'none',
                         fontWeight: 600,
-                        color: '#3949ab'
                        }}
                     >
                         Log in

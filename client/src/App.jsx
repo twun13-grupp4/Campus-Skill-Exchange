@@ -9,21 +9,20 @@ import QuestionDetailPage from './pages/QuestionDetailPage'
 import AskQuestionPage from './pages/AskQuestionPage'
 import NotFoundPage from './pages/NotFoundPage'
 
-
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
-          <CssBaseline />
-          <Navbar />
+        <CssBaseline />
+        <Navbar />
 
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/questions/:id" element={<QuestionDetailPage />} />
-            <Route path="/ask" element={<AskQuestionPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/questions/:id" element={<QuestionDetailPage />} />
+          <Route path="/ask" element={<AskQuestionPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </BrowserRouter>
     </ThemeProvider>
   )

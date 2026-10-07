@@ -1,6 +1,7 @@
 import { Container, Grid, Typography } from "@mui/material"
 import mockQuestions from "../data/mockQuestions"
 import QuestionCard from "../components/QuestionCard"
+import CategoryFilter from "../components/CategoryFilter"
 
 function HomePage() {
     return (
@@ -12,6 +13,9 @@ function HomePage() {
             <Typography component="p" variant="body1">
                Ask questions, share your knowledge, and learn from other students
             </Typography>
+
+            {/* Tillfällig placering för att se filtret - flyttas bredvid sökrutan under navbaren senare */}
+            <CategoryFilter />
 
             <Grid container spacing={2} sx={{ mt: 4 }}>
                 {mockQuestions.map((question) => (

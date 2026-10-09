@@ -118,6 +118,26 @@ function LoginPage() {
                         Log in
                     </Button>
 
+                    <Box sx={{ textAlign: 'center' }}>
+                        <Typography component="span" variant="body2" color="text.secondary">
+                            If you're new here:{' '}
+                        </Typography>
+
+                        <Button
+                           type="button"
+                           variant="text"
+                           size="small"
+                           sx={{
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            minWidth: 'auto',
+                            p: 0.5,
+                           }}
+                        >
+                            Sign up
+                        </Button>
+                    </Box>
+
                     {submitted && (
                         <Alert severity="info">
                             This form is a demo. Login is not connected yet.

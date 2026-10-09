@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router-dom'
 import { useState } from 'react'
 import { 
     Container, 
@@ -11,6 +12,7 @@ import {
     Stack,
     TextField, 
 } from '@mui/material'
+
 
 function LoginPage() {
     const [email, setEmail] = useState('')
@@ -124,7 +126,8 @@ function LoginPage() {
                         </Typography>
 
                         <Button
-                           type="button"
+                           component={RouterLink}
+                           to="/signup"
                            variant="text"
                            size="small"
                            sx={{

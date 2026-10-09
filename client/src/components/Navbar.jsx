@@ -57,6 +57,29 @@ function Navbar() {
                         >
                             Log in
                         </Button>
+
+                        <Button
+                            component={RouterLink}
+                            to="/signup"
+                            variant="contained"
+                            disableElevation
+                            sx={{
+                                flexShrink: 0,
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                bgcolor: '#373ee5',
+                                color: '#ffffff',
+                                borderRadius: '12px',
+                                px: 2.5,
+                                py: 1.25,
+                                '&:hover': {
+                                    bgcolor: '#2c32bd',
+                                },
+                            }}
+                        >
+                            Sign up
+
+                        </Button>
                     </Box>
                 </Toolbar>
             </Container>

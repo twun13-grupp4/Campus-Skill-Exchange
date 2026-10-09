@@ -8,6 +8,7 @@ import theme from './theme'
 import QuestionDetailPage from './pages/QuestionDetailPage'
 import AskQuestionPage from './pages/AskQuestionPage'
 import NotFoundPage from './pages/NotFoundPage'
+import SignUpPage from './pages/SignUpPage'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/questions/:id" element={<QuestionDetailPage />} />
           <Route path="/ask" element={<AskQuestionPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

@@ -2,7 +2,9 @@ import client from './client'
 
 /**
  * GET /questions
- * Alla frågor, nyast först. params = valfria filter, t.ex. { school, courseTag, status }
+ * Frågor, nyast först (bäst träff först vid sökning).
+ * params = valfria filter som kombineras (AND): { school, course, status, search }
+ * school och course är id:n, status är 'unanswered' eller 'answered'
  */
 export const getQuestions = async (params = {}) => {
   const response = await client.get('/questions', { params }) // params blir ?school=...&status=...
@@ -29,7 +31,8 @@ export const getAnswers = async (questionId) => {
 
 /**
  * POST /questions (kräver inloggning, token läggs på automatiskt)
- * data = { title, description, courseTag, school }
+ * data = { title, description, course }, course = id från getCourses()
+ * skolan sätts av servern utifrån kursen
  */
 export const createQuestion = async (data) => {
   const response = await client.post('/questions', data)

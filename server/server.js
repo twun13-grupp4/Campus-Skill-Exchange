@@ -7,8 +7,11 @@ const app = express(); //starta serverappen
 app.use(cors());
 app.use(express.json()); // appen tolkar JSON
 
-const questionsRoutes = require('./routes/questionRoutes'); //hämtar routerfilen (mockfråga)
+const questionsRoutes = require('./routes/questionRoutes'); //hämtar routerfilen 
 app.use('/api/questions', questionsRoutes) //(path, funktion) för test curl http://localhost:3000/api/questions
+
+const userRoutes = require('./routes/userRoutes') //routerfil för användare
+app.use('/api/users', userRoutes) //börjar med /api/users
 
 const PORT = process.env.PORT || 3000; //http://localhost:3000
 

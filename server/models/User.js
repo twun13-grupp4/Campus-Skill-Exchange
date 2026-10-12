@@ -17,8 +17,17 @@ const userSchema = new mongoose.Schema(
       enum: ['student', 'teacher', 'moderator'],
       default: 'student',
     },
-    school: { type: String, required: true },
-    program: { type: String, required: true },
+    school: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'School',
+      required: true,
+    },
+    // must belong to the user's school, checked when registering
+    program: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Program',
+      required: true,
+    },
     rating: { type: Number, default: 0 },
   },
   { timestamps: true },

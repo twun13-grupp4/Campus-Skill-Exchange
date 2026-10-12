@@ -9,6 +9,7 @@ import QuestionDetailPage from './pages/QuestionDetailPage'
 import AskQuestionPage from './pages/AskQuestionPage'
 import NotFoundPage from './pages/NotFoundPage'
 import SignUpPage from './pages/SignUpPage'
+import DashboardPage from './pages/DashboardPage'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/ask" element={<AskQuestionPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="*" element={<NotFoundPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

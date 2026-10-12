@@ -5,11 +5,17 @@ import CategoryFilter from '../components/CategoryFilter'
 import { useState } from 'react'
 import SearchBar from '../components/SearchBar'
 
-function HomePage() {
+/**
+ * Displays search, category filters, and question cards.
+ * Optional children appear above the homepage content.
+ */
+function HomePage({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
+      {/* Display the dashboard welcome message when provided. */}
+      {children}
       <Typography component="h1" variant="h4" gutterBottom>
         Learn and share with your campus
       </Typography>

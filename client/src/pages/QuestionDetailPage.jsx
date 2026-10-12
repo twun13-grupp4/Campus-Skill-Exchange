@@ -1,11 +1,18 @@
-import { Button, Chip, Container, Stack, Typography } from '@mui/material'
+import { Avatar, Button, Chip, Container, Stack, Paper, Typography } from '@mui/material'
 import { Link as RouterLink, useParams } from 'react-router-dom'
 import mockQuestions from '../data/mockQuestions'
 
+
+/**
+ * Displays a question's course, status, author, date, and description.
+ */
 function QuestionDetailPage() {
   const { id } = useParams()
+
+  // Find the question that matches the ID in the page URL.
   const question = mockQuestions.find((q) => q._id === id)
 
+  // Show a fallback page if the question does not exist.
   if (!question) {
     return (
       <Container component="main" maxWidth="md" sx={{ py: 4 }}>
@@ -16,11 +23,30 @@ function QuestionDetailPage() {
         <Button component={RouterLink} to="/" sx={{ textTransform: 'none' }}>
           ← Back to all questions
         </Button>
+
       </Container>
     )
   }
 
   const isAnswered = question.status === 'answered'
+
+  // Use the first letters of up to two names for the author's avatar.
+  const authorInitials = question.author
+     .trim()
+     .split(/\s+/)
+     .slice(0, 2)
+     .map((name) => name[0])
+     .join('')
+     .toUpperCase()
+
+  // Display the date in a short format, such as "20 Sept".
+  const formattedDate = new Date(question.createdAt).toLocaleDateString(
+    'en-GB',
+    {
+      day: 'numeric',
+      month: 'short',
+    },
+  )
 
   return (
     <Container component="main" maxWidth="md" sx={{ py: 4 }}>
@@ -32,28 +58,107 @@ function QuestionDetailPage() {
         ← Back to all questions
       </Button>
 
-      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-        <Chip label={question.courseTag} size="small" />
-        <Chip
-          label={isAnswered ? 'Answered' : 'Unanswered'}
-          size="small"
-          variant="outlined"
-          color={isAnswered ? 'success' : 'default'}
-        />
-      </Stack>
+      <Paper
+        component="article"
+        variant="outlined"
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          borderColor: '#e2e8f0',
+          bgcolor: 'background.paper',
+        }}
+      >
 
-      <Typography component="h1" variant="h4" gutterBottom>
-        {question.title}
-      </Typography>
+        {/* Course name and answer status */}
+        <Stack
+          direction="row"
+          sx={{ 
+            mb: 2,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+         }}
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: '#444ce7', fontWeight: 600 }}
+          >
+            {question.courseTag}
+          </Typography>
 
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Asked by {question.author} ·{' '}
-        {new Date(question.createdAt).toLocaleDateString()}
-      </Typography>
+          <Chip
+            label={isAnswered ? '✓ Answered' : 'Unanswered'}
+            size="small"
+            sx={{
+              borderRadius: 1,
+              bgcolor: isAnswered ? '#edf7f0' : '#f1f3f8',
+              color: isAnswered ? '#288057' : '#64748b',
+              fontSize: '0.75rem',
+            }}
+          />
+        </Stack>
 
-      <Typography component="p" variant="body1">
-        {question.description}
-      </Typography>
+        <Typography 
+          component="h1" 
+          sx={{
+            mb: 3,
+            fontSize: '1.875rem',
+            fontWeight: 700,
+            lineHeight: 1.3,
+            color: 'text.primary',
+            overflowWrap: 'anywhere',
+          }}
+        >
+          {question.title}
+        </Typography>
+
+        {/* Author details, aligned vertically with the avatar */}
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{ 
+            mb: 3,
+            alignItems:'center',
+           }}
+        >
+          <Avatar
+            sx={{
+              width: 42,
+              height: 42,
+              bgcolor: '#dce5ff',
+              color: '#294b8a',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+            }}
+          >
+            {authorInitials}
+          </Avatar>
+
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: '#36558a' }}
+          >
+            {question.author}
+          </Typography>
+
+          <Typography variant="caption" color="text.secondary">
+            {formattedDate}
+          </Typography>
+        </Stack>
+
+        {/* Preserve line breaks in the question description */}
+        <Typography
+          component="p"
+          variant="body1"
+          color="text.primary"
+          sx={{
+            lineHeight: 1.8,
+            whiteSpace: 'pre-wrap',
+            overflowWrap: 'anywhere',
+          }}
+        >
+          {question.description}
+        </Typography>
+      </Paper>
     </Container>
   )
 }

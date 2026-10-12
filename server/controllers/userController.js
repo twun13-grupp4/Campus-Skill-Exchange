@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken') //skapar och kollar tokens
-const User = require('../models/User') //hämta anävndat-modellen 
+const User = require('../models/User') //hämta anävndat-modellen
+const { isValidSchoolProgram } = require('../services/schoolService') //kollar skola + program
 
 /**
  * skapar en JWT-token med använderns id, giltig i 7 dagar 
@@ -9,14 +10,15 @@ const createToken = (userId) =>
 
 /**
  * Plockar ut de fält som är ok att skicka till klienten(ej lösenord)
+ * förväntar sig att school och program är populerade ({ _id, name })
  */
 const toPublicUser = (user) => ({
     _id: user._id,
     name: user.name,
     email: user.email,
     role: user.role,
-    school: user.school,
-    program: user.program,
+    school: { _id: user.school._id, name: user.school.name },
+    program: { _id: user.program._id, name: user.program.name },
 })
 
 /**
@@ -28,8 +30,14 @@ const registerUser = async (req,res) => {
         //bara de fält vi tillåterr, INTE role
         const {name, email, password, school, program} = req.body
 
+        //school och program = id:n från GET /api/schools och /api/programs, programmet måste höra till skolan
+        if(!(await isValidSchoolProgram(school, program))) {
+            return res.status(400).json({message: 'Invalid school or program'})
+        }
+
         //skapa användaren, lösenordet hashas i User.js
         const user = await User.create({name, email, password, school, program })
+        await user.populate([{path: 'school', select: 'name'}, {path: 'program', select: 'name'}]) //namnen till svaret
 
         res.status(201).json({token: createToken(user._id), user: toPublicUser(user)})
     }   catch(error) {
@@ -62,7 +70,10 @@ const loginUser = async(req,res) => {
         }
 
         //leta upp användaren +password behövs efterrsom lösenordet är select: false i User.js
-        const user = await User.findOne({email: email.toLowerCase()}).select('+password')
+        const user = await User.findOne({email: email.toLowerCase()})
+            .select('+password')
+            .populate('school', 'name')
+            .populate('program', 'name')
 
         //samma svar oavsett om är email eller lösenord som är fel
         if(!user || !(await user.comparePassword(password))) {

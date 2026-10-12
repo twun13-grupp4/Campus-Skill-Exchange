@@ -1,50 +1,146 @@
 require('dotenv/config') //läser in mongodb_uri från .env
 const mongoose = require('mongoose')
 const connectDB = require('./config/db') // Albins anslutningsfunktion
+const School = require('./models/School')
+const Program = require('./models/Program')
+const Course = require('./models/Course')
 const User = require('./models/User')
 const Question = require('./models/Question')
 const Answer = require('./models/Answer')
 
 /**
  * Fyller databasen med testdata
- * OBS: tömmer users, questions och answers först
- * körs med :npm run initdb
+ * OBS: tömmer schools, programs, courses, users, questions och answers först
+ * körs med: npm run initdb -- --yes
  */
 const initDB = async () => {
-    await connectDB() //anslut till database
+  // skyddar den delade databasen mot att tömmas av misstag
+  if (!process.argv.includes('--yes')) {
+    console.log(
+      'initDB clears ALL schools, programs, courses, users, questions and answers in the shared database.',
+    )
+    console.log('Run it with: npm run initdb -- --yes')
+    return
+  }
 
+  await connectDB() //anslut till database
 
-// tom allt så vi börjar frpn noll
-await Answer.deleteMany()
-await Question.deleteMany()
-await User.deleteMany()
+  // töm allt så vi börjar från noll
+  await Answer.deleteMany()
+  await Question.deleteMany()
+  await User.deleteMany()
+  await Course.deleteMany()
+  await Program.deleteMany()
+  await School.deleteMany()
 
-//skapa användere
-const [anna, erik, sara] = await User.create([
-    { name: 'Anna', email: 'anna@test.se', password: 'password123', school: 'Lunds universitet', program: 'Civilingenjör i teknisk matematik' },
-    { name: 'Erik', email: 'erik@test.se', password: 'password123', school: 'Lunds universitet', program: 'Civilingenjör i informations- och kommunikationsteknik' },
-    { name: 'Sara', email: 'sara@test.se', password: 'password123', school: 'KTH', program: 'Civilingenjör i datateknik', role: 'teacher' },
-])
+  // skapa skolor
+  const [lu, kth, chalmers] = await School.create([
+    { name: 'Lunds universitet' },
+    { name: 'KTH' },
+    { name: 'Chalmers' },
+  ])
 
-//skapa frpgor, author = id:t från användere ovan 
-const [q1, q2] = await Question.create([
-    { title: 'Kan du differentialekvationer?', description: 'Jag fastnar på separabla ekvationer, någon som kan förklara steg för steg?', courseTag: 'Envariabelanalys', school: 'Lunds universitet', author: anna._id },
-    { title: 'Hur fungerar useEffect i React?', description: 'Förstår inte när den körs och vad dependency-arrayen gör.', courseTag: 'Webbutveckling', school: 'Lunds universitet', author: erik._id, status: 'answered' },
-    { title: 'Tips inför tentan i algoritmer?', description: 'Vilka kapitel är viktigast att plugga på?', courseTag: 'Algoritmer och datastrukturer', school: 'KTH', author: sara._id },
-])
+  // skapa program, school = id:t från skolorna ovan
+  const [luItek, luTekMat, kthData] = await Program.create([
+    {
+      name: 'Civilingenjör i informations- och kommunikationsteknik',
+      school: lu._id,
+    },
+    { name: 'Civilingenjör i teknisk matematik', school: lu._id },
+    { name: 'Civilingenjör i datateknik', school: kth._id },
+    { name: 'Civilingenjör i maskinteknik', school: chalmers._id },
+  ])
 
-//skapa svar, question = id:t
-await Answer.create([
-    { question: q2._id, description: 'useEffect körs efter varje render, om inte dependency-arrayen säger annat.', author: sara._id, upvotes: 3 },
-    { question: q2._id, description: 'Tom array [] betyder att den bara körs en gång när komponenten laddas.', author: anna._id, upvotes: 1 },
-])
+  // skapa kurser, school = id:t från skolorna ovan
+  await Course.create([
+    { name: 'Webbutveckling', school: lu._id },
+    { name: 'Diskret matematik', school: lu._id },
+    { name: 'Envariabelanalys', school: lu._id },
+    { name: 'Linjär algebra', school: lu._id },
+    { name: 'Algoritmer och datastrukturer', school: kth._id },
+    { name: 'Mekanik', school: chalmers._id },
+  ])
 
-console.log(`Database initialise 3 users, 3 questions, 2 answers (${q1.title}...)`)
+  // skapa användare, school och program = id:n från ovan
+  const [anna, erik, sara] = await User.create([
+    {
+      name: 'Anna',
+      email: 'anna@test.se',
+      password: 'password123',
+      school: lu._id,
+      program: luTekMat._id,
+    },
+    {
+      name: 'Erik',
+      email: 'erik@test.se',
+      password: 'password123',
+      school: lu._id,
+      program: luItek._id,
+    },
+    {
+      name: 'Sara',
+      email: 'sara@test.se',
+      password: 'password123',
+      school: kth._id,
+      program: kthData._id,
+      role: 'teacher',
+    },
+  ])
+
+  // skapa frågor, author = id:t från användarna ovan
+  // school och courseTag är fortfarande text tills Question byter till referenser
+  const [, q2] = await Question.create([
+    {
+      title: 'Kan du differentialekvationer?',
+      description:
+        'Jag fastnar på separabla ekvationer, någon som kan förklara steg för steg?',
+      courseTag: 'Envariabelanalys',
+      school: lu.name,
+      author: anna._id,
+    },
+    {
+      title: 'Hur fungerar useEffect i React?',
+      description: 'Förstår inte när den körs och vad dependency-arrayen gör.',
+      courseTag: 'Webbutveckling',
+      school: lu.name,
+      author: erik._id,
+      status: 'answered',
+    },
+    {
+      title: 'Tips inför tentan i algoritmer?',
+      description: 'Vilka kapitel är viktigast att plugga på?',
+      courseTag: 'Algoritmer och datastrukturer',
+      school: kth.name,
+      author: sara._id,
+    },
+  ])
+
+  // skapa svar, question = id:t
+  await Answer.create([
+    {
+      question: q2._id,
+      description:
+        'useEffect körs efter varje render, om inte dependency-arrayen säger annat.',
+      author: sara._id,
+      upvotes: 3,
+    },
+    {
+      question: q2._id,
+      description:
+        'Tom array [] betyder att den bara körs en gång när komponenten laddas.',
+      author: anna._id,
+      upvotes: 1,
+    },
+  ])
+
+  console.log(
+    'Database initialised: 3 schools, 4 programs, 6 courses, 3 users, 3 questions, 2 answers',
+  )
 }
 
 initDB()
-    .catch((error) => {
-        console.error('initDB failed', error.message)
-        process.exitCode = 1 // talar om att skriptet misslyckats 
-    })
-    .finally(() => mongoose.connection.close()) //ständ anslutninge så skriptet avslutas 
+  .catch((error) => {
+    console.error('initDB failed', error.message)
+    process.exitCode = 1 // talar om att skriptet misslyckats
+  })
+  .finally(() => mongoose.connection.close()) // stäng anslutningen så skriptet avslutas

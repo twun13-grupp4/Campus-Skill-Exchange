@@ -13,6 +13,15 @@ app.use('/api/questions', questionsRoutes) //(path, funktion) för test curl htt
 const userRoutes = require('./routes/userRoutes') //routerfil för användare
 app.use('/api/users', userRoutes) //börjar med /api/users
 
+const schoolRoutes = require('./routes/schoolRoutes') //skolor
+app.use('/api/schools', schoolRoutes)
+
+const programRoutes = require('./routes/programRoutes') //program, kan filtreras på skola
+app.use('/api/programs', programRoutes)
+
+const courseRoutes = require('./routes/courseRoutes') //kurser, kan filtreras på skola
+app.use('/api/courses', courseRoutes)
+
 const PORT = process.env.PORT || 3000; //http://localhost:3000
 
 // starta servern först när databasen är ansluten

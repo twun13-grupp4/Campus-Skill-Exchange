@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { 
     Container, 
@@ -12,20 +12,33 @@ import {
     Stack,
     TextField, 
 } from '@mui/material'
+import { login } from '../api/users'
+import { getErrorMessage } from '../api/client'
 
 
 function LoginPage() {
+    const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
-    const [submitted, setSubmitted] = useState(false)
+    const [error, setError] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
-        setSubmitted(true)
+        setError('')
+        setIsSubmitting(true)
+
+        try {
+            await login(email, password)
+            navigate('/dashboard')
+        } catch (submitError) {
+            setError(getErrorMessage(submitError))
+        } finally {
+            setIsSubmitting(false)
+        }
     }
-
-
+    
     return (
         <Container component="main" maxWidth="sm" sx={{ py: {xs: 4, sm: 8} }}>
             <Paper
@@ -72,7 +85,7 @@ function LoginPage() {
                        value={email}
                        onChange={(event) => {
                         setEmail(event.target.value)
-                        setSubmitted(false)
+                        setError('')
                        }}
                        required
                        fullWidth
@@ -87,7 +100,7 @@ function LoginPage() {
                        value={password}
                        onChange={(event) => {
                         setPassword(event.target.value)
-                        setSubmitted(false)
+                        setError('')
                        }}
                        required
                        fullWidth
@@ -110,6 +123,7 @@ function LoginPage() {
                        variant="contained"
                        size="large"
                        disableElevation
+                       disabled={isSubmitting}
                        sx={{
                         py: 1.5,
                         borderRadius: 2,
@@ -117,7 +131,7 @@ function LoginPage() {
                         fontWeight: 700,
                        }}
                     >
-                        Log in
+                        {isSubmitting ? 'Logging in..' : 'Log in'}
                     </Button>
 
                     <Box sx={{ textAlign: 'center' }}>
@@ -141,9 +155,9 @@ function LoginPage() {
                         </Button>
                     </Box>
 
-                    {submitted && (
-                        <Alert severity="info">
-                            This form is a demo. Login is not connected yet.
+                    {error && (
+                        <Alert severity="error">
+                            {error}
                         </Alert>
                     )}
                 </Stack>

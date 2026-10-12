@@ -1,4 +1,4 @@
-import { Button, Chip, Container, Stack, Typography } from '@mui/material'
+import { Button, Chip, Container, Stack, Paper, Typography } from '@mui/material'
 import { Link as RouterLink, useParams } from 'react-router-dom'
 import mockQuestions from '../data/mockQuestions'
 
@@ -16,6 +16,7 @@ function QuestionDetailPage() {
         <Button component={RouterLink} to="/" sx={{ textTransform: 'none' }}>
           ← Back to all questions
         </Button>
+
       </Container>
     )
   }
@@ -32,28 +33,41 @@ function QuestionDetailPage() {
         ← Back to all questions
       </Button>
 
-      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-        <Chip label={question.courseTag} size="small" />
-        <Chip
-          label={isAnswered ? 'Answered' : 'Unanswered'}
-          size="small"
-          variant="outlined"
-          color={isAnswered ? 'success' : 'default'}
-        />
-      </Stack>
+      <Paper
+        component="article"
+        variant="outlined"
+        sx={{
+          p: { xs: 3, sm: 4 },
+          borderRadius: 3,
+          borderColor: '#e2e8f0',
+          bgcolor: 'background.paper',
+        }}
+      >
+      
 
-      <Typography component="h1" variant="h4" gutterBottom>
-        {question.title}
-      </Typography>
+        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+          <Chip label={question.courseTag} size="small" />
+          <Chip
+            label={isAnswered ? 'Answered' : 'Unanswered'}
+            size="small"
+            variant="outlined"
+            color={isAnswered ? 'success' : 'default'}
+          />
+        </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Asked by {question.author} ·{' '}
-        {new Date(question.createdAt).toLocaleDateString()}
-      </Typography>
+        <Typography component="h1" variant="h4" gutterBottom>
+          {question.title}
+        </Typography>
 
-      <Typography component="p" variant="body1">
-        {question.description}
-      </Typography>
+       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+         Asked by {question.author} ·{' '}
+         {new Date(question.createdAt).toLocaleDateString()}
+        </Typography>
+
+        <Typography component="p" variant="body1">
+          {question.description}
+        </Typography>
+      </Paper>
     </Container>
   )
 }

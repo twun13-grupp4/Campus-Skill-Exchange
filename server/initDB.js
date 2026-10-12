@@ -33,6 +33,9 @@ const initDB = async () => {
   await Program.deleteMany()
   await School.deleteMany()
 
+  // ta bort gamla index (t.ex. courseTag) och skapa nya, som textindexet för sök
+  await Question.syncIndexes()
+
   // skapa skolor
   const [lu, kth, chalmers] = await School.create([
     { name: 'Lunds universitet' },
@@ -52,7 +55,7 @@ const initDB = async () => {
   ])
 
   // skapa kurser, school = id:t från skolorna ovan
-  await Course.create([
+  const [webbutv, , envarre, , algo] = await Course.create([
     { name: 'Webbutveckling', school: lu._id },
     { name: 'Diskret matematik', school: lu._id },
     { name: 'Envariabelanalys', school: lu._id },
@@ -88,29 +91,29 @@ const initDB = async () => {
   ])
 
   // skapa frågor, author = id:t från användarna ovan
-  // school och courseTag är fortfarande text tills Question byter till referenser
+  // school kopieras från kursen, precis som questionService gör
   const [, q2] = await Question.create([
     {
       title: 'Kan du differentialekvationer?',
       description:
         'Jag fastnar på separabla ekvationer, någon som kan förklara steg för steg?',
-      courseTag: 'Envariabelanalys',
-      school: lu.name,
+      course: envarre._id,
+      school: envarre.school,
       author: anna._id,
     },
     {
       title: 'Hur fungerar useEffect i React?',
       description: 'Förstår inte när den körs och vad dependency-arrayen gör.',
-      courseTag: 'Webbutveckling',
-      school: lu.name,
+      course: webbutv._id,
+      school: webbutv.school,
       author: erik._id,
       status: 'answered',
     },
     {
       title: 'Tips inför tentan i algoritmer?',
       description: 'Vilka kapitel är viktigast att plugga på?',
-      courseTag: 'Algoritmer och datastrukturer',
-      school: kth.name,
+      course: algo._id,
+      school: algo.school,
       author: sara._id,
     },
   ])

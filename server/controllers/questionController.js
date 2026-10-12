@@ -1,18 +1,19 @@
-const Question = require('../models/Question') //hämta fråge-modellen
-require('../models/User') // registrerar User-modellen så populate('author') funkar
-const mongoose = require('mongoose') // för att kolla om ett id är giltigt
+const questionService = require('../services/questionService')
 
 /**
- * GET /api/questions
- * Hämtar alla frågor från databasen, nyast först
+ * GET /api/questions?school=&course=&status=&search=
+ * Hämtar frågor, nyast först. Alla filter är valfria och kombineras (AND).
  */
 const getQuestions = async (req, res) => {
   try {
-    const questions = await Question.find() //hämta alla frågor
-      .populate('author', 'name') //byt ut author-id mot användarens nam
-      .sort({ createdAt: -1 }) //nyast först
-
-    res.json(questions) //skicka listan till JSON
+    const { school, course, status, search } = req.query
+    const questions = await questionService.listQuestions({
+      school,
+      course,
+      status,
+      search,
+    })
+    res.json(questions)
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Could not fetch questions' }) //500 = serverfel
@@ -25,16 +26,9 @@ const getQuestions = async (req, res) => {
  */
 const getQuestionById = async (req, res) => {
   try {
-    const { id } = req.params //plockar ut id:n från url:en
+    const question = await questionService.getQuestion(req.params.id)
 
-    //ogiltigt id-formatl(t.ex "abc") -> finns inte
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(404).json({ message: 'Question not found' })
-    }
-    const question = await Question.findById(id) //leta upp frågan
-      .populate('author', 'name')
-
-    //giltigt id men ingen fråga med id:t
+    //ogiltigt id eller ingen fråga med id:t
     if (!question) {
       return res.status(404).json({ message: 'Question not found' })
     }
@@ -48,27 +42,28 @@ const getQuestionById = async (req, res) => {
 
 /**
  * POST /api/questions
- * skapar ny fråga och sparar den i database. author = inloggade användaren
+ * Skapar ny fråga. author = inloggade användaren, school = kursens skola
  */
 const createQuestion = async (req, res) => {
   try {
-    //plocka bara ut de fält vi tillåter
-    const { title, description, courseTag, school } = req.body
+    //plocka bara ut de fält vi tillåter, course = id från GET /api/courses
+    const { title, description, course } = req.body
 
-    //skapa och spara frågan i databasem
-    const question = await Question.create({
-      title,
-      description,
-      courseTag,
-      school,
-      author: req.user._id, //inloggade användare
-    })
+    const question = await questionService.createQuestion(
+      { title, description, course },
+      req.user,
+    )
 
-    res.status(201).json(question) //201 = skapad, skicka tillbaka den sparade frågan
+    //kursen finns inte
+    if (!question) {
+      return res.status(400).json({ message: 'Invalid course' })
+    }
+
+    res.status(201).json(question) //201 = skapad
   } catch (error) {
     //fält saknas eller fel format
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: error.message }) //400 dålig förfrågan av användaren
+      return res.status(400).json({ message: error.message }) //400 = dålig förfrågan
     }
 
     console.error(error)
@@ -76,4 +71,4 @@ const createQuestion = async (req, res) => {
   }
 }
 
-module.exports = { getQuestions, getQuestionById, createQuestion } //gör funktonen shareble
+module.exports = { getQuestions, getQuestionById, createQuestion }

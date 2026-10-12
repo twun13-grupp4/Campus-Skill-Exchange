@@ -2,10 +2,19 @@ const mongoose = require('mongoose')
 
 const questionSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    courseTag: { type: String, required: true },
-    school: { type: String, required: true },
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: true,
+    },
+    // copied from the course's school when the question is created, kept for filtering
+    school: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'School',
+      required: true,
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -25,6 +34,10 @@ const questionSchema = new mongoose.Schema(
   { timestamps: true },
 )
 
-questionSchema.index({ school: 1, courseTag: 1, status: 1 })
+// filtering: school + course + status, used by GET /api/questions?school=&course=&status=
+questionSchema.index({ school: 1, course: 1, status: 1 })
+
+// search (#48): lets MongoDB match words in title and description
+questionSchema.index({ title: 'text', description: 'text' })
 
 module.exports = mongoose.model('Question', questionSchema)

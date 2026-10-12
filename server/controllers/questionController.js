@@ -48,12 +48,12 @@ const getQuestionById = async (req, res) => {
 
 /**
  * POST /api/questions
- * skapar ny fråga och sparar den i database
+ * skapar ny fråga och sparar den i database. author = inloggade användaren
  */
 const createQuestion = async (req, res) => { 
     try {
         //plocka bara ut de fält vi tillåter
-        const{title, description, courseTag, school, author} = req.body
+        const{title, description, courseTag, school} = req.body
 
         //skapa och spara frågan i databasem
         const question = await Question.create({
@@ -61,7 +61,7 @@ const createQuestion = async (req, res) => {
             description,
             courseTag,
             school,
-            author,
+            author: req.user._id, //inloggade användare
         })
 
         res.status(201).json(question) //201 = skapad, skicka tillbaka den sparade frågan

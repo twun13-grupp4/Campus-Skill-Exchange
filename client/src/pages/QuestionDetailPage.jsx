@@ -2,10 +2,17 @@ import { Avatar, Button, Chip, Container, Stack, Paper, Typography } from '@mui/
 import { Link as RouterLink, useParams } from 'react-router-dom'
 import mockQuestions from '../data/mockQuestions'
 
+
+/**
+ * Displays a question's course, status, author, date, and description.
+ */
 function QuestionDetailPage() {
   const { id } = useParams()
+
+  // Find the question that matches the ID in the page URL.
   const question = mockQuestions.find((q) => q._id === id)
 
+  // Show a fallback page if the question does not exist.
   if (!question) {
     return (
       <Container component="main" maxWidth="md" sx={{ py: 4 }}>
@@ -23,6 +30,7 @@ function QuestionDetailPage() {
 
   const isAnswered = question.status === 'answered'
 
+  // Use the first letters of up to two names for the author's avatar.
   const authorInitials = question.author
      .trim()
      .split(/\s+/)
@@ -31,6 +39,7 @@ function QuestionDetailPage() {
      .join('')
      .toUpperCase()
 
+  // Display the date in a short format, such as "20 Sept".
   const formattedDate = new Date(question.createdAt).toLocaleDateString(
     'en-GB',
     {
@@ -60,6 +69,7 @@ function QuestionDetailPage() {
         }}
       >
 
+        {/* Course name and answer status */}
         <Stack
           direction="row"
           sx={{ 
@@ -101,6 +111,7 @@ function QuestionDetailPage() {
           {question.title}
         </Typography>
 
+        {/* Author details, aligned vertically with the avatar */}
         <Stack
           direction="row"
           spacing={1.5}
@@ -134,6 +145,7 @@ function QuestionDetailPage() {
           </Typography>
         </Stack>
 
+        {/* Preserve line breaks in the question description */}
         <Typography
           component="p"
           variant="body1"

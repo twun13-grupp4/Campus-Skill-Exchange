@@ -17,6 +17,7 @@ import AskQuestionPage from './pages/AskQuestionPage'
 import NotFoundPage from './pages/NotFoundPage'
 import SignUpPage from './pages/SignUpPage'
 import DashboardPage from './pages/DashboardPage'
+import ProfilePage from './pages/ProfilePage'
 
 /**
  * Waits for the saved session to be checked before displaying pages.
@@ -59,6 +60,7 @@ function AppContent() {
         <Route path="/ask" element={<AskQuestionPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/profile" element={<ProfilePage/>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>

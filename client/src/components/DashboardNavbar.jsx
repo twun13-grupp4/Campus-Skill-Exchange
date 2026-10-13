@@ -235,7 +235,16 @@ function DashboardNavbar() {
 
           <Divider />
 
-          <MenuItem sx={{ py: 1.25 }}>My profile</MenuItem>
+          
+          <MenuItem
+            component={RouterLink}
+            to="/profile"
+            onClick={closeProfileMenu}
+            sx={{ py: 1.25 }}
+          >
+            My profile
+          </MenuItem>
+
           <MenuItem sx={{ py: 1.25 }}>Messages</MenuItem>
           <MenuItem onClick={handleLogout} sx={{ py: 1.25 }}>
             Log out
@@ -312,10 +321,15 @@ function DashboardNavbar() {
             <Divider sx={{ my: 2 }} />
 
             <List disablePadding>
-              <ListItemButton sx={{ py: 1.25 }}>
+              <ListItemButton
+                component={RouterLink}
+                to="/profile"
+                onClick={() => setIsSidebarOpen(false)}
+                sx={{ py: 1.25 }}
+              >
                 <ListItemText primary="My profile" />
               </ListItemButton>
-
+              
               <ListItemButton onClick={handleLogout} sx={{ py: 1.25 }}>
                 <ListItemText primary="Log out" />
               </ListItemButton>

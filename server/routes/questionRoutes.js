@@ -8,11 +8,18 @@ const {
   getQuestionById,
   createQuestion,
 } = require('../controllers/questionController') //hämtar funktionen
-const { getAnswersByQuestion } = require('../controllers/answerController')
+const {
+  getAnswersByQuestion,
+  createAnswer,
+} = require('../controllers/answerController')
+
 const requireAuth = require('../middleware/requireAuth') //kollar inlogg
 
 // kör getQuestions om det kommer en GET
 router.get('/', getQuestions)
+
+// kör createAnswer om det kommer en POST till /api/questions/:id/answers, men bara om man är inloggad
+router.post('/:id/answers', requireAuth, createAnswer)
 
 // kör getQuestionById om det kommer en GET med id
 router.get('/:id', getQuestionById)

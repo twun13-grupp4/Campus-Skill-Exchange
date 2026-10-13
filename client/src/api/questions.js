@@ -38,3 +38,14 @@ export const createQuestion = async (data) => {
   const response = await client.post('/questions', data)
   return response.data
 }
+
+/**
+ * POST /questions/:id/answers (kräver inloggning, token läggs på automatiskt)
+ * Skapar ett svar på frågan och returnerar det sparade svaret.
+ */
+export const createAnswer = async (questionId, description) => {
+  const response = await client.post(`/questions/${questionId}/answers`, {
+    description,
+  })
+  return response.data
+}

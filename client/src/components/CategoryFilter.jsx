@@ -1,28 +1,55 @@
-import { useMemo, useState } from 'react'
-import { Autocomplete, Button, Stack, TextField } from '@mui/material'
-import { schools, programs, courses } from '../data/mockCategories'
+import { useEffect, useState } from 'react'
+import { Alert, Autocomplete, Button, Stack, TextField } from '@mui/material'
+import { getSchools, getPrograms, getCourses } from '../api/schools'
+import { getErrorMessage } from '../api/client'
 
 function CategoryFilter({ onChange }) {
+  const [schools, setSchools] = useState([])
+  const [programs, setPrograms] = useState([])
+  const [courses, setCourses] = useState([])
+  const [loadError, setLoadError] = useState('')
+
   const [school, setSchool] = useState(null)
   const [program, setProgram] = useState(null)
   const [course, setCourse] = useState(null)
 
-  const programOptions = useMemo(
-    () =>
-      school ? programs.filter((p) => p.schoolId === school.id) : programs,
-    [school],
-  )
+  // Load the full list of schools once.
+  useEffect(() => {
+    let isActive = true
 
-  const courseOptions = useMemo(() => {
-    if (program) return courses.filter((c) => c.programId === program.id)
-    if (school) {
-      const programIds = programs
-        .filter((p) => p.schoolId === school.id)
-        .map((p) => p.id)
-      return courses.filter((c) => programIds.includes(c.programId))
+    getSchools()
+      .then((data) => {
+        if (isActive) setSchools(data)
+      })
+      .catch((fetchError) => {
+        if (isActive) setLoadError(getErrorMessage(fetchError))
+      })
+
+    return () => {
+      isActive = false
     }
-    return courses
-  }, [school, program])
+  }, [])
+
+  // Load programs + courses for the selected school (or all, if none selected).
+  // NOTE: courses aren't linked to programs yet (#76) - picking a program
+  // doesn't narrow this course list, it's display-only until that lands.
+  useEffect(() => {
+    let isActive = true
+
+    Promise.all([getPrograms(school?._id), getCourses(school?._id)])
+      .then(([programsData, coursesData]) => {
+        if (!isActive) return
+        setPrograms(programsData)
+        setCourses(coursesData)
+      })
+      .catch((fetchError) => {
+        if (isActive) setLoadError(getErrorMessage(fetchError))
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [school])
 
   const hasActiveFilter = school || program || course
 
@@ -32,28 +59,16 @@ function CategoryFilter({ onChange }) {
 
   function handleSchoolChange(value) {
     setSchool(value)
-    // Byter skola -> rensa program/kurs om de inte längre hör till den skolan
-    const stillValidProgram =
-      value && program && program.schoolId === value.id ? program : null
-    const stillValidCourse =
-      stillValidProgram && course && course.programId === stillValidProgram.id
-        ? course
-        : null
-    setProgram(stillValidProgram)
-    setCourse(stillValidCourse)
-    emitChange({
-      school: value,
-      program: stillValidProgram,
-      course: stillValidCourse,
-    })
+    // Program/course lists are about to reload for the new school, so
+    // whatever was picked before isn't guaranteed to still be valid.
+    setProgram(null)
+    setCourse(null)
+    emitChange({ school: value, program: null, course: null })
   }
 
   function handleProgramChange(value) {
     setProgram(value)
-    const stillValidCourse =
-      value && course && course.programId === value.id ? course : null
-    setCourse(stillValidCourse)
-    emitChange({ school, program: value, course: stillValidCourse })
+    emitChange({ school, program: value, course })
   }
 
   function handleCourseChange(value) {
@@ -69,55 +84,59 @@ function CategoryFilter({ onChange }) {
   }
 
   return (
-    <Stack
-      direction="row"
-      spacing={1.5}
-      flexWrap="wrap"
-      useFlexGap
-      alignItems="center"
-    >
-      <Autocomplete
-        size="small"
-        options={schools}
-        value={school}
-        onChange={(_, value) => handleSchoolChange(value)}
-        getOptionLabel={(option) => option.name}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        sx={{ width: 220 }}
-        renderInput={(params) => <TextField {...params} label="School" />}
-      />
-
-      <Autocomplete
-        size="small"
-        options={programOptions}
-        value={program}
-        onChange={(_, value) => handleProgramChange(value)}
-        getOptionLabel={(option) => option.name}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        sx={{ width: 260 }}
-        renderInput={(params) => <TextField {...params} label="Program" />}
-      />
-
-      <Autocomplete
-        size="small"
-        options={courseOptions}
-        value={course}
-        onChange={(_, value) => handleCourseChange(value)}
-        getOptionLabel={(option) => option.name}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        sx={{ width: 220 }}
-        renderInput={(params) => <TextField {...params} label="Course" />}
-      />
-
-      {hasActiveFilter && (
-        <Button
+    <Stack spacing={1}>
+      <Stack
+        direction="row"
+        spacing={1.5}
+        flexWrap="wrap"
+        useFlexGap
+        alignItems="center"
+      >
+        <Autocomplete
           size="small"
-          onClick={handleClear}
-          sx={{ textTransform: 'none' }}
-        >
-          Reset filter
-        </Button>
-      )}
+          options={schools}
+          value={school}
+          onChange={(_, value) => handleSchoolChange(value)}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          sx={{ width: 220 }}
+          renderInput={(params) => <TextField {...params} label="School" />}
+        />
+
+        <Autocomplete
+          size="small"
+          options={programs}
+          value={program}
+          onChange={(_, value) => handleProgramChange(value)}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          sx={{ width: 260 }}
+          renderInput={(params) => <TextField {...params} label="Program" />}
+        />
+
+        <Autocomplete
+          size="small"
+          options={courses}
+          value={course}
+          onChange={(_, value) => handleCourseChange(value)}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          sx={{ width: 220 }}
+          renderInput={(params) => <TextField {...params} label="Course" />}
+        />
+
+        {hasActiveFilter && (
+          <Button
+            size="small"
+            onClick={handleClear}
+            sx={{ textTransform: 'none' }}
+          >
+            Reset filter
+          </Button>
+        )}
+      </Stack>
+
+      {loadError && <Alert severity="error">{loadError}</Alert>}
     </Stack>
   )
 }

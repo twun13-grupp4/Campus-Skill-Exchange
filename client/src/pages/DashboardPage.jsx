@@ -1,16 +1,22 @@
 import { Chip, Stack, Typography } from '@mui/material'
 import HomePage from './HomePage'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../AuthContext'
 
 /**
- * Displays a preview of the logged-in homepage using mock user data.
- * Authentication will be connected in a later issue.
+ * Displays the logged-in user's welcome message and question listing.
+ * Visitors without a session are redirected to login.
  */
 function DashboardPage() {
-  const user = {
-    name: 'Alex Morgan',
+  const { user } = useAuth()
+
+  // Require a logged-in user to display the dashboard.
+  if (!user) {
+    return <Navigate to="/login" replace />
   }
 
-  const firstName = user.name.split(' ')[0]
+  // Use the actual account name in the welcome message.
+  const firstName = user.name.trim().split(/\s+/)[0]
 
   return (
     <HomePage>

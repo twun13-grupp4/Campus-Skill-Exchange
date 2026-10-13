@@ -1,5 +1,6 @@
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '../AuthContext'
 import {
   AppBar,
   Avatar,
@@ -21,9 +22,9 @@ import {
 } from '@mui/material'
 
 /**
- * Displays the dashboard navbar with mock user details.
- * Profile and sidebar menus open, but their actions are not connected.
- * Notifications are not connected yet.
+ * Displays the logged-in user's profile and account navigation.
+ * Both logout buttons clear the session and return to the homepage.
+ * Notifications, profile, and messages are not connected yet.
  */
 function DashboardNavbar() {
   // Store the clicked profile button so the menu opens beneath it.
@@ -32,9 +33,29 @@ function DashboardNavbar() {
   // Control whether the sidebar is visible.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  const { user, endSession } = useAuth()
+  const navigate = useNavigate()
+
+  // Build the avatar initials from the logged-in user's name.
+  const initials = user.name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((name) => name[0])
+    .join('')
+    .toUpperCase()
+
   /** Close the profile menu when dismissed. */
   function closeProfileMenu() {
     setProfileAnchor(null)
+  }
+
+  /** Clear the session and return to the public homepage. */
+  function handleLogout() {
+    setProfileAnchor(null)
+    setIsSidebarOpen(false)
+    endSession()
+    navigate('/', { replace: true })
   }
 
   return (
@@ -115,7 +136,7 @@ function DashboardNavbar() {
             {/* Open the profile dropdown beneath the avatar. */}
             <Button
               id="profile-menu-button"
-              aria-label="Open Alex Morgan's profile menu"
+              aria-label={`Open ${user.name}'s profile menu`}
               aria-controls={isProfileOpen ? 'profile-menu' : undefined}
               aria-haspopup="menu"
               aria-expanded={isProfileOpen ? 'true' : undefined}
@@ -137,7 +158,7 @@ function DashboardNavbar() {
                   fontWeight: 700,
                 }}
               >
-                AM
+                {initials}
               </Avatar>
 
               <SvgIcon sx={{ fontSize: 18 }}>
@@ -171,7 +192,7 @@ function DashboardNavbar() {
             </IconButton>
           </Stack>
         </Toolbar>
-        {/* Profile menu preview; account actions are not connected yet. */}
+        {/* Profile menu with account details and logout. */}
         <Menu
           id="profile-menu"
           anchorEl={profileAnchor}
@@ -201,10 +222,14 @@ function DashboardNavbar() {
           }}
         >
           <Box role="presentation" sx={{ px: 2, py: 1 }}>
-            <Typography sx={{ fontWeight: 700 }}>Alex Morgan</Typography>
+            <Typography sx={{ fontWeight: 700 }}>{user.name}</Typography>
 
-            <Typography variant="body2" color="text.secondary">
-              Student
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textTransform: 'capitalize' }}
+            >
+              {user.role}
             </Typography>
           </Box>
 
@@ -212,10 +237,12 @@ function DashboardNavbar() {
 
           <MenuItem sx={{ py: 1.25 }}>My profile</MenuItem>
           <MenuItem sx={{ py: 1.25 }}>Messages</MenuItem>
-          <MenuItem sx={{ py: 1.25 }}>Log out</MenuItem>
+          <MenuItem onClick={handleLogout} sx={{ py: 1.25 }}>
+            Log out
+          </MenuItem>
         </Menu>
 
-        {/* Sidebar preview; navigation and logout are not connected yet. */}
+        {/* Sidebar navigation; only logout is connected so far. */}
         <Drawer
           anchor="right"
           open={isSidebarOpen}
@@ -289,7 +316,7 @@ function DashboardNavbar() {
                 <ListItemText primary="My profile" />
               </ListItemButton>
 
-              <ListItemButton sx={{ py: 1.25 }}>
+              <ListItemButton onClick={handleLogout} sx={{ py: 1.25 }}>
                 <ListItemText primary="Log out" />
               </ListItemButton>
             </List>

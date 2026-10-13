@@ -6,17 +6,15 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
-import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import DashboardNavbar from './DashboardNavbar'
+import { useAuth } from '../AuthContext'
 
 function Navbar() {
-  const { pathname } = useLocation()
+  const { user } = useAuth()
 
-  // Show the logged-in navbar on these preview pages.
-  // This controls appearance only; authentication will be added later.
-  const dashboardPages = ['/dashboard', '/ask']
-
-  if (dashboardPages.includes(pathname)) {
+  // Show the account navbar whenever a user is logged in.
+  if (user) {
     return <DashboardNavbar />
   }
 

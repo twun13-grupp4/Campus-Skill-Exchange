@@ -44,7 +44,7 @@ const initDB = async () => {
   ])
 
   // skapa program, school = id:t från skolorna ovan
-  const [luItek, luTekMat, kthData] = await Program.create([
+  const [luItek, luTekMat, kthData, chMaskin] = await Program.create([
     {
       name: 'Civilingenjör i informations- och kommunikationsteknik',
       school: lu._id,
@@ -55,13 +55,38 @@ const initDB = async () => {
   ])
 
   // skapa kurser, school = id:t från skolorna ovan
+  // programs = programmen kursen ingår i (en kurs kan ingå i flera)
   const [webbutv, , envarre, , algo] = await Course.create([
-    { name: 'Webbutveckling', school: lu._id },
-    { name: 'Diskret matematik', school: lu._id },
-    { name: 'Envariabelanalys', school: lu._id },
-    { name: 'Linjär algebra', school: lu._id },
-    { name: 'Algoritmer och datastrukturer', school: kth._id },
-    { name: 'Mekanik', school: chalmers._id },
+    {
+      name: 'Webbutveckling',
+      school: lu._id,
+      programs: [luItek._id],
+    },
+    {
+      name: 'Diskret matematik',
+      school: lu._id,
+      programs: [luItek._id],
+    },
+    {
+      name: 'Envariabelanalys',
+      school: lu._id,
+      programs: [luTekMat._id],
+    },
+    {
+      name: 'Linjär algebra',
+      school: lu._id,
+      programs: [luItek._id, luTekMat._id],
+    },
+    {
+      name: 'Algoritmer och datastrukturer',
+      school: kth._id,
+      programs: [kthData._id],
+    },
+    {
+      name: 'Mekanik',
+      school: chalmers._id,
+      programs: [chMaskin._id],
+    },
   ])
 
   // skapa användare, school och program = id:n från ovan

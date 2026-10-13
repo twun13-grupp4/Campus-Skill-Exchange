@@ -12,17 +12,28 @@ import SearchBar from '../components/SearchBar'
  */
 function HomePage({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState({
+    school: null,
+    program: null,
+    course: null,
+  })
   const [questions, setQuestions] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
+  const schoolId = categoryFilter.school?._id
+  const programId = categoryFilter.program?._id
+  const courseId = categoryFilter.course?._id
+  const isFiltered = Boolean(schoolId || programId || courseId)
+
   useEffect(() => {
     let isActive = true
 
-    getQuestions()
+    getQuestions({ school: schoolId, program: programId, course: courseId })
       .then((data) => {
         if (!isActive) return
         setQuestions(data)
+        setLoadError('')
       })
       .catch((fetchError) => {
         if(!isActive) return
@@ -35,7 +46,7 @@ function HomePage({ children }) {
       return () => {
         isActive = false
       }
-  }, [])
+  }, [schoolId, programId, courseId])
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
@@ -51,7 +62,7 @@ function HomePage({ children }) {
 
       <Stack spacing={1.5} sx={{ mt: 3 }}>
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <CategoryFilter />
+        <CategoryFilter onChange={setCategoryFilter} />
       </Stack>
 
       {isLoading && (
@@ -68,7 +79,9 @@ function HomePage({ children }) {
 
       {!isLoading && !loadError && questions.length === 0 && (
         <Typography color="text.secondary" sx={{ mt: 4 }}>
-          No questions yet - be the first to ask one.
+          {isFiltered 
+          ? 'No question match this filter.' 
+          : 'No questions yet - be the first one to ask one.'}
         </Typography>
       )}
 

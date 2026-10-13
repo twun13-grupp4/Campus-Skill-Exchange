@@ -21,12 +21,12 @@ export const getPrograms = async (schoolId) => {
 }
 
 /**
- * GET /courses?school=<id>
- * Alla kurser, eller bara de på en skola om schoolId skickas.
+ * GET /courses?school=<id>&program=<id>
+ * Alla kurser, eller bara de på en skola och/eller i ett program.
  */
-export const getCourses = async (schoolId) => {
+export const getCourses = async (schoolId, programId) => {
   const response = await client.get('/courses', {
-    params: { school: schoolId },
+    params: { school: schoolId, program: programId },
   })
   return response.data
 }

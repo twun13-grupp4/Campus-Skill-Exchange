@@ -12,13 +12,14 @@ import {
 import { getCourses } from '../api/schools' //hämta kurser
 import { createQuestion } from '../api/questions' //spara frågan
 import { getErrorMessage } from '../api/client' //visar servers fel
-import { getToken } from '../api/token' //kollar inloggnigne
+import { useAuth } from '../AuthContext' // vem som är inloggad
 
 /**
  * Sida där en inloggad användare ställer en fråga i en kurs.
  * Kurserna hämtas från servern, frågan sparas med POST /api/questions.
  */
 function AskQuestionPage() {
+  const { user } = useAuth() // den inloggade användaren, null om utloggad
   const navigate = useNavigate()
 
   const [title, setTitle] = useState('')
@@ -60,7 +61,7 @@ function AskQuestionPage() {
   }
 
   // inte inloggad -> visa länk till login i stället för formuläret
-  if (!getToken()) {
+  if (!user) {
     return (
       <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
         <Alert severity="info" sx={{ mb: 2 }}>

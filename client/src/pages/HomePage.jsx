@@ -12,7 +12,7 @@ import SearchBar from '../components/SearchBar'
  */
 function HomePage({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [CategoryFilter, setCategoryFilter] = useState({
+  const [categoryFilter, setCategoryFilter] = useState({
     school: null,
     program: null,
     course: null,
@@ -21,8 +21,8 @@ function HomePage({ children }) {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
-  const schoolId = CategoryFilter.school?._id
-  const courseId = CategoryFilter.course?._id
+  const schoolId = categoryFilter.school?._id
+  const courseId = categoryFilter.course?._id
   const isFiltered = Boolean(schoolId || courseId)
 
   useEffect(() => {

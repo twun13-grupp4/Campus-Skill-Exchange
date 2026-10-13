@@ -31,12 +31,13 @@ const getPrograms = async (req, res) => {
 }
 
 /**
- * GET /api/courses?school=<schoolId>
- * All courses, or only the ones at one school if `school` is given.
+ * GET /api/courses?school=<schoolId>&program=<programId>
+ * All courses, or only the ones at one school and/or in one program.
  */
 const getCourses = async (req, res) => {
   try {
-    res.json(await listCourses({ school: req.query.school }))
+    const { school, program } = req.query
+    res.json(await listCourses({ school, program }))
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Could not fetch courses' })

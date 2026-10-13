@@ -37,7 +37,4 @@ const questionSchema = new mongoose.Schema(
 // filtering: school + course + status, used by GET /api/questions?school=&course=&status=
 questionSchema.index({ school: 1, course: 1, status: 1 })
 
-// search (#48): lets MongoDB match words in title and description
-questionSchema.index({ title: 'text', description: 'text' })
-
 module.exports = mongoose.model('Question', questionSchema)

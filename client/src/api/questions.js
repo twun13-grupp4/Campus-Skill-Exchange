@@ -2,7 +2,7 @@ import client from './client'
 
 /**
  * GET /questions
- * Frågor, nyast först (bäst träff först vid sökning).
+ * Frågor, nyast först. search matchar alla ord, även delar av ord, i titel och beskrivning.
  * params = valfria filter som kombineras (AND): { school, program, course, status, search }
  * school, program och course är id:n, status är 'unanswered' eller 'answered'
  */

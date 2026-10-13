@@ -1,4 +1,11 @@
-import { Alert, CircularProgress, Container, Grid, Stack, Typography } from '@mui/material'
+import {
+  Alert,
+  CircularProgress,
+  Container,
+  Grid,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { getQuestions } from '../api/questions'
 import { getErrorMessage } from '../api/client'
@@ -24,29 +31,48 @@ function HomePage({ children }) {
   const schoolId = categoryFilter.school?._id
   const programId = categoryFilter.program?._id
   const courseId = categoryFilter.course?._id
-  const isFiltered = Boolean(schoolId || programId || courseId)
+  const search = searchQuery.trim()
+  const isFiltered = Boolean(schoolId || programId || courseId || search)
 
+  // Load questions through the API when a filter changes,
+  // or after the user pauses typing in the search box for 300 ms.
   useEffect(() => {
     let isActive = true
 
-    getQuestions({ school: schoolId, program: programId, course: courseId })
-      .then((data) => {
-        if (!isActive) return
-        setQuestions(data)
-        setLoadError('')
-      })
-      .catch((fetchError) => {
-        if(!isActive) return
-        setLoadError(getErrorMessage(fetchError))
-      })
-      .finally(() => {
-        if (isActive) setIsLoading(false)
-      })
+    const timeoutId = setTimeout(async () => {
+      setIsLoading(true)
+      setLoadError('')
 
-      return () => {
-        isActive = false
+      try {
+        // Filters that are not set are left out of the request,
+        // so no filters and an empty search load all questions.
+        const data = await getQuestions({
+          school: schoolId,
+          program: programId,
+          course: courseId,
+          search: search || undefined,
+        })
+
+        if (isActive) {
+          setQuestions(data)
+        }
+      } catch (error) {
+        if (isActive) {
+          setLoadError(getErrorMessage(error))
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
       }
-  }, [schoolId, programId, courseId])
+    }, 300)
+
+    // Cancel a pending request and ignore outdated responses.
+    return () => {
+      isActive = false
+      clearTimeout(timeoutId)
+    }
+  }, [schoolId, programId, courseId, search])
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
@@ -66,7 +92,7 @@ function HomePage({ children }) {
       </Stack>
 
       {isLoading && (
-        <Stack sx={{ mt: 4, alignItems: 'center'}}>
+        <Stack sx={{ mt: 4, alignItems: 'center' }}>
           <CircularProgress />
         </Stack>
       )}
@@ -77,11 +103,12 @@ function HomePage({ children }) {
         </Alert>
       )}
 
+      {/* Distinguish a search or filter without results from an empty list. */}
       {!isLoading && !loadError && questions.length === 0 && (
-        <Typography color="text.secondary" sx={{ mt: 4 }}>
-          {isFiltered 
-          ? 'No question match this filter.' 
-          : 'No questions yet - be the first one to ask one.'}
+        <Typography role="status" color="text.secondary" sx={{ mt: 4 }}>
+          {isFiltered
+            ? 'No questions match your search or filters.'
+            : 'No questions yet — be the first to ask one.'}
         </Typography>
       )}
 
@@ -94,7 +121,6 @@ function HomePage({ children }) {
           ))}
         </Grid>
       )}
-
     </Container>
   )
 }

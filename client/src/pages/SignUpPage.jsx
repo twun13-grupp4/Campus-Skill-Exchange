@@ -3,6 +3,7 @@ import { getSchools, getPrograms } from '../api/schools'
 import { getErrorMessage } from '../api/client'
 import { register } from '../api/users'
 import { Link as RouterLink } from 'react-router-dom'
+import { useAuth } from '../AuthContext'
 import {
   Container,
   Typography,
@@ -27,6 +28,7 @@ function SignUpPage() {
   // Track the signup request and show any server error.
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const { startSession } = useAuth()
 
   // Store the database options and their loading state.
   const [schools, setSchools] = useState([])
@@ -98,7 +100,8 @@ function SignUpPage() {
     setIsSubmitting(true)
 
     try {
-      await register({
+      // Create the account and share the returned user throughout the app.
+      const user = await register({
         name: fullName.trim(),
         email: email.trim(),
         password,
@@ -106,6 +109,7 @@ function SignUpPage() {
         program,
       })
 
+      startSession(user)
       setSubmitted(true)
       setPassword('')
     } catch (error) {

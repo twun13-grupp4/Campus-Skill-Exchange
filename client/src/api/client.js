@@ -22,9 +22,25 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const token = getToken()
+    const requestToken = error.config?.headers?.Authorization
+    const requestUrl = error.config?.url
+
+    // Failed login credentials should not clear an existing session.
+    const isAccountRequest =
+      requestUrl === '/users/login' || requestUrl === '/users/register'
+
+    // Only clear the session if the rejected request used its current token.
+    // An older request must not log out a newly authenticated user.
+    if (
+      error.response?.status === 401 &&
+      !isAccountRequest &&
+      token &&
+      requestToken === `Bearer ${token}`
+    ) {
       clearToken()
     }
+
     return Promise.reject(error) // skicka felet vidare så sidan kan visa medelandet
   },
 )

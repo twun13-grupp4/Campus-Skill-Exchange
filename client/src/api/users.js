@@ -26,3 +26,12 @@ export const login = async (email, password) => {
  * Loggar ut genom att slänga token (servern sparar inget om inloggningen).
  */
 export const logout = () => clearToken()
+
+/**
+ * Returns the logged-in user's profile.
+ * The shared API client automatically sends the saved token.
+ */
+export const getCurrentUser = async () => {
+  const response = await client.get('/users/me')
+  return response.data
+}

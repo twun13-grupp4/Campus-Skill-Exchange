@@ -35,8 +35,14 @@ const toPublicQuestion = (question) => ({
 })
 
 /**
+ * Escapes characters that have a special meaning in a regular expression,
+ * so the user's search text is matched literally.
+ */
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
  * Questions matching ALL given filters, newest first.
- * With a search text, the best matches come first instead.
+ * `search` matches every word anywhere in the title or description, also inside words.
  * `program` matches questions in any course that is part of that program.
  * An invalid id or status gives an empty list instead of an error.
  */
@@ -73,14 +79,20 @@ const listQuestions = async ({
     }
   }
 
-  let sort = { createdAt: -1 }
   if (typeof search === 'string' && search.trim()) {
-    filter.$text = { $search: search.trim() }
-    sort = { score: { $meta: 'textScore' }, createdAt: -1 }
+    // every word must appear in the title or description, in any case,
+    // and also inside longer words ("use" finds "useEffect")
+    filter.$and = search
+      .trim()
+      .split(/\s+/)
+      .map((word) => {
+        const pattern = new RegExp(escapeRegex(word), 'i')
+        return { $or: [{ title: pattern }, { description: pattern }] }
+      })
   }
 
   const questions = await Question.find(filter)
-    .sort(sort)
+    .sort({ createdAt: -1 })
     .populate(POPULATE)
     .lean()
   return questions.map(toPublicQuestion)

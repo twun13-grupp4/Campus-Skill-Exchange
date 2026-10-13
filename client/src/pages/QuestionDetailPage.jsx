@@ -7,22 +7,27 @@ import AnswerCard from '../components/AnswerCard'
 
 
 /**
- * Displays a question's course, status, author, date, and description.
+ * Reads the id from the URL and remounts QuestionDetailContent whenever it
+ * changes, so loading/error/question/answers reset to their initial values
+ * for free instead of being reset manually inside an effect.
  */
 function QuestionDetailPage() {
   const { id } = useParams()
+  return <QuestionDetailContent key={id} id={id} />
+}
 
-  // Find the question that matches the ID in the page URL.
+/**
+ * Displays a question's course, status, author, date, and description.
+ */
+function QuestionDetailContent({ id }) {
   const [question, setQuestion] = useState(null)
   const [answers, setAnswers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
-  //fetch the question + its answer wherever the id in the URL changes
+  //fetch the question + its answers
   useEffect(() => {
     let isActive = true // guard against setting state after this was cleaned up
-    setIsLoading(true)
-    setLoadError('')
 
     Promise.all([getQuestion(id), getAnswers(id)])
       .then(([questionData, answerData]) => {

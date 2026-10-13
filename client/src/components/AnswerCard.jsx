@@ -3,10 +3,10 @@ import { Avatar, Paper, Stack, Typography } from "@mui/material"
 /* Displays one answer's author, date, upvotes and description */
 
 function AnswerCard({ answer }) {
-    const autorName = answer.author?.name ?? 'Deleted user'
+    const authorName = answer.author?.name ?? 'Deleted user'
 
     //use first letter of up to two names for the authors avatar.
-    const authorInitials = autorName
+    const authorInitials = authorName
         .trim()
         .split(/\s+/)
         .slice(0, 2)

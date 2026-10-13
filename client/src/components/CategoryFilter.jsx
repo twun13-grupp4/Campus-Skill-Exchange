@@ -30,13 +30,11 @@ function CategoryFilter({ onChange }) {
     }
   }, [])
 
-  // Load programs + courses for the selected school (or all, if none selected).
-  // NOTE: courses aren't linked to programs yet (#76) - picking a program
-  // doesn't narrow this course list, it's display-only until that lands.
+  // Load programs + courses for the selected school/program (or all, if none selected).
   useEffect(() => {
     let isActive = true
 
-    Promise.all([getPrograms(school?._id), getCourses(school?._id)])
+    Promise.all([getPrograms(school?._id), getCourses(school?._id, program?._id)])
       .then(([programsData, coursesData]) => {
         if (!isActive) return
         setPrograms(programsData)
@@ -49,7 +47,7 @@ function CategoryFilter({ onChange }) {
     return () => {
       isActive = false
     }
-  }, [school])
+  }, [school, program])
 
   const hasActiveFilter = school || program || course
 
@@ -68,7 +66,10 @@ function CategoryFilter({ onChange }) {
 
   function handleProgramChange(value) {
     setProgram(value)
-    emitChange({ school, program: value, course })
+    // The course list is about to reload for the new program, so whatever
+    // was picked before isn't guaranteed to still belong to it.
+    setCourse(null)
+    emitChange({ school, program: value, course: null })
   }
 
   function handleCourseChange(value) {

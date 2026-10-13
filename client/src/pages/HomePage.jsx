@@ -22,13 +22,14 @@ function HomePage({ children }) {
   const [loadError, setLoadError] = useState('')
 
   const schoolId = categoryFilter.school?._id
+  const programId = categoryFilter.program?._id
   const courseId = categoryFilter.course?._id
-  const isFiltered = Boolean(schoolId || courseId)
+  const isFiltered = Boolean(schoolId || programId || courseId)
 
   useEffect(() => {
     let isActive = true
 
-    getQuestions({school: schoolId, course: courseId})
+    getQuestions({ school: schoolId, program: programId, course: courseId })
       .then((data) => {
         if (!isActive) return
         setQuestions(data)
@@ -45,7 +46,7 @@ function HomePage({ children }) {
       return () => {
         isActive = false
       }
-  }, [schoolId, courseId])
+  }, [schoolId, programId, courseId])
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>

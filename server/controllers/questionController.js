@@ -1,14 +1,15 @@
 const questionService = require('../services/questionService')
 
 /**
- * GET /api/questions?school=&course=&status=&search=
+ * GET /api/questions?school=&program=&course=&status=&search=
  * Hämtar frågor, nyast först. Alla filter är valfria och kombineras (AND).
  */
 const getQuestions = async (req, res) => {
   try {
-    const { school, course, status, search } = req.query
+    const { school, program, course, status, search } = req.query
     const questions = await questionService.listQuestions({
       school,
+      program,
       course,
       status,
       search,

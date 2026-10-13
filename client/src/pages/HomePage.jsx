@@ -19,11 +19,23 @@ import SearchBar from '../components/SearchBar'
  */
 function HomePage({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState({
+    school: null,
+    program: null,
+    course: null,
+  })
   const [questions, setQuestions] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
-  // Search through the API after the user pauses typing for 300 ms.
+  const schoolId = categoryFilter.school?._id
+  const programId = categoryFilter.program?._id
+  const courseId = categoryFilter.course?._id
+  const search = searchQuery.trim()
+  const isFiltered = Boolean(schoolId || programId || courseId || search)
+
+  // Load questions through the API when a filter changes,
+  // or after the user pauses typing in the search box for 300 ms.
   useEffect(() => {
     let isActive = true
 
@@ -32,11 +44,14 @@ function HomePage({ children }) {
       setLoadError('')
 
       try {
-        const search = searchQuery.trim()
-
-        // An empty search loads all questions.
-        // MongoDB handles matching titles and descriptions.
-        const data = await getQuestions(search ? { search } : {})
+        // Filters that are not set are left out of the request,
+        // so no filters and an empty search load all questions.
+        const data = await getQuestions({
+          school: schoolId,
+          program: programId,
+          course: courseId,
+          search: search || undefined,
+        })
 
         if (isActive) {
           setQuestions(data)
@@ -52,12 +67,12 @@ function HomePage({ children }) {
       }
     }, 300)
 
-    // Cancel a pending search and ignore outdated responses.
+    // Cancel a pending request and ignore outdated responses.
     return () => {
       isActive = false
       clearTimeout(timeoutId)
     }
-  }, [searchQuery])
+  }, [schoolId, programId, courseId, search])
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
@@ -73,7 +88,7 @@ function HomePage({ children }) {
 
       <Stack spacing={1.5} sx={{ mt: 3 }}>
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <CategoryFilter />
+        <CategoryFilter onChange={setCategoryFilter} />
       </Stack>
 
       {isLoading && (
@@ -88,11 +103,11 @@ function HomePage({ children }) {
         </Alert>
       )}
 
-      {/* Distinguish an unsuccessful search from an empty question list. */}
+      {/* Distinguish a search or filter without results from an empty list. */}
       {!isLoading && !loadError && questions.length === 0 && (
         <Typography role="status" color="text.secondary" sx={{ mt: 4 }}>
-          {searchQuery.trim()
-            ? 'No matching questions. Try another word from the title or description.'
+          {isFiltered
+            ? 'No questions match your search or filters.'
             : 'No questions yet — be the first to ask one.'}
         </Typography>
       )}

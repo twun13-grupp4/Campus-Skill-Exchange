@@ -37,9 +37,16 @@ const toPublicQuestion = (question) => ({
 /**
  * Questions matching ALL given filters, newest first.
  * With a search text, the best matches come first instead.
+ * `program` matches questions in any course that is part of that program.
  * An invalid id or status gives an empty list instead of an error.
  */
-const listQuestions = async ({ school, course, status, search } = {}) => {
+const listQuestions = async ({
+  school,
+  program,
+  course,
+  status,
+  search,
+} = {}) => {
   const filter = {}
 
   if (school) {
@@ -53,6 +60,17 @@ const listQuestions = async ({ school, course, status, search } = {}) => {
   if (status) {
     if (!STATUSES.includes(status)) return []
     filter.status = status
+  }
+  if (program) {
+    if (!mongoose.isValidObjectId(program)) return []
+    // questions have no program field, so filter on the program's courses
+    const courseIds = await Course.distinct('_id', { programs: program })
+    if (course) {
+      // both given: the chosen course has to be part of the program
+      if (!courseIds.some((id) => id.equals(course))) return []
+    } else {
+      filter.course = { $in: courseIds }
+    }
   }
 
   let sort = { createdAt: -1 }

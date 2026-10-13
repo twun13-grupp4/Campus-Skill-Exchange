@@ -53,11 +53,18 @@ const listPrograms = async ({ school } = {}) => {
 }
 
 /**
- * All courses, optionally only the ones at one school, sorted by name.
+ * All courses, optionally only the ones at one school and/or in one program,
+ * sorted by name.
  */
-const listCourses = async ({ school } = {}) => {
+const listCourses = async ({ school, program } = {}) => {
   const filter = schoolFilter(school)
   if (!filter) return []
+
+  if (program) {
+    if (!mongoose.isValidObjectId(program)) return []
+    // matches courses whose programs list contains this program
+    filter.programs = program
+  }
 
   const courses = await Course.find(filter)
     .populate('school', 'name')

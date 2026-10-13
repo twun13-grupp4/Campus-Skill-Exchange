@@ -8,6 +8,13 @@ const courseSchema = new mongoose.Schema(
       ref: 'School',
       required: true,
     },
+    // the programs this course is part of (a course can belong to several)
+    programs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Program',
+      },
+    ],
   },
   { timestamps: true },
 )

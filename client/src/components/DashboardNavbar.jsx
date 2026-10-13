@@ -1,6 +1,7 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../AuthContext'
+import Logo from './Logo'
 import {
   AppBar,
   Avatar,
@@ -70,26 +71,8 @@ function DashboardNavbar() {
     >
       <Container maxWidth="lg">
         <Toolbar disableGutters sx={{ minHeight: 76 }}>
-          {/* Return to the dashboard when the site name is clicked. */}
-          <Typography
-            variant="h6"
-            component={RouterLink}
-            to="/dashboard"
-            sx={{
-              fontWeight: 400,
-              letterSpacing: '-0.5px',
-              color: 'inherit',
-              textDecoration: 'none',
-              borderRadius: 1,
-              '&:focus-visible': {
-                outline: '2px solid',
-                outlineColor: 'primary.main',
-                outlineOffset: '4px',
-              },
-            }}
-          >
-            <strong>Campus</strong>SkillExchange
-          </Typography>
+          {/* Return to the logged-in homepage. */}
+          <Logo to="/dashboard" />
 
           <Stack
             direction="row"
@@ -235,7 +218,6 @@ function DashboardNavbar() {
 
           <Divider />
 
-          
           <MenuItem
             component={RouterLink}
             to="/profile"
@@ -329,7 +311,7 @@ function DashboardNavbar() {
               >
                 <ListItemText primary="My profile" />
               </ListItemButton>
-              
+
               <ListItemButton onClick={handleLogout} sx={{ py: 1.25 }}>
                 <ListItemText primary="Log out" />
               </ListItemButton>

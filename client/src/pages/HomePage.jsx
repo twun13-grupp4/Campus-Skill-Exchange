@@ -1,8 +1,9 @@
-import { Container, Grid, Stack, Typography } from '@mui/material'
-import mockQuestions from '../data/mockQuestions'
+import { Alert, CircularProgress, Container, Grid, Stack, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { getQuestions } from '../api/questions'
+import { getErrorMessage } from '../api/client'
 import QuestionCard from '../components/QuestionCard'
 import CategoryFilter from '../components/CategoryFilter'
-import { useState } from 'react'
 import SearchBar from '../components/SearchBar'
 
 /**
@@ -11,6 +12,30 @@ import SearchBar from '../components/SearchBar'
  */
 function HomePage({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [questions, setQuestions] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+
+  useEffect(() => {
+    let isActive = true
+
+    getQuestions()
+      .then((data) => {
+        if (!isActive) return
+        setQuestions(data)
+      })
+      .catch((fetchError) => {
+        if(!isActive) return
+        setLoadError(getErrorMessage(fetchError))
+      })
+      .finally(() => {
+        if (isActive) setIsLoading(false)
+      })
+
+      return () => {
+        isActive = false
+      }
+  }, [])
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
@@ -29,13 +54,34 @@ function HomePage({ children }) {
         <CategoryFilter />
       </Stack>
 
-      <Grid container spacing={2} sx={{ mt: 4 }}>
-        {mockQuestions.map((question) => (
-          <Grid key={question._id} size={12}>
-            <QuestionCard question={question} />
-          </Grid>
-        ))}
-      </Grid>
+      {isLoading && (
+        <Stack sx={{ mt: 4, alignItems: 'center'}}>
+          <CircularProgress />
+        </Stack>
+      )}
+
+      {!isLoading && loadError && (
+        <Alert severity="error" sx={{ mt: 4 }}>
+          {loadError}
+        </Alert>
+      )}
+
+      {!isLoading && !loadError && questions.length === 0 && (
+        <Typography color="text.secondary" sx={{ mt: 4 }}>
+          No questions yet - be the first to ask one.
+        </Typography>
+      )}
+
+      {!isLoading && !loadError && questions.length > 0 && (
+        <Grid container spacing={2} sx={{ mt: 4 }}>
+          {questions.map((question) => (
+            <Grid key={question._id} size={12}>
+              <QuestionCard question={question} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
     </Container>
   )
 }

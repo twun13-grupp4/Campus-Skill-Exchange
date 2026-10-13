@@ -1,14 +1,8 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  Container,
-  Toolbar,
-  Typography,
-} from '@mui/material'
+import { AppBar, Box, Button, Container, Toolbar } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import DashboardNavbar from './DashboardNavbar'
 import { useAuth } from '../AuthContext'
+import Logo from './Logo'
 
 function Navbar() {
   const { user } = useAuth()
@@ -30,25 +24,8 @@ function Navbar() {
     >
       <Container maxWidth="lg">
         <Toolbar disableGutters sx={{ minHeight: { xs: 64, sm: 76 } }}>
-          <Typography
-            variant="h6"
-            component={RouterLink}
-            to="/"
-            sx={{
-              fontWeight: 400,
-              letterSpacing: '-0.5px',
-              color: 'inherit',
-              textDecoration: 'none',
-              borderRadius: 1,
-              '&:focus-visible': {
-                outline: '2px solid',
-                outlineColor: 'primary.main',
-                outlineOffset: '4px',
-              },
-            }}
-          >
-            <strong>Campus</strong>SkillExchange
-          </Typography>
+          {/* Return to the public homepage. */}
+          <Logo to="/" />
 
           <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
             <Button

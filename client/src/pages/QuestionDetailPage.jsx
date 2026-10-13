@@ -1,10 +1,21 @@
-import { Avatar, Button, Chip, CircularProgress, Container, Stack, Paper, Typography, Alert } from '@mui/material'
+import {
+  Avatar,
+  Button,
+  Chip,
+  CircularProgress,
+  Container,
+  Stack,
+  Paper,
+  Typography,
+  Alert,
+  TextField,
+} from '@mui/material'
 import { Link as RouterLink, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getQuestion, getAnswers} from '../api/questions'
+import { getQuestion, getAnswers, createAnswer } from '../api/questions'
 import { getErrorMessage } from '../api/client'
 import AnswerCard from '../components/AnswerCard'
-
+import { useAuth } from '../AuthContext'
 
 /**
  * Reads the id from the URL and remounts QuestionDetailContent whenever it
@@ -24,6 +35,14 @@ function QuestionDetailContent({ id }) {
   const [answers, setAnswers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  // Store the answer draft while the user writes.
+  const [answerText, setAnswerText] = useState('')
+  const { user } = useAuth()
+
+  // Track answer submission separately from loading the question.
+  const [isPostingAnswer, setIsPostingAnswer] = useState(false)
+  const [answerError, setAnswerError] = useState('')
+  const [answerPosted, setAnswerPosted] = useState(false)
 
   //fetch the question + its answers
   useEffect(() => {
@@ -31,12 +50,12 @@ function QuestionDetailContent({ id }) {
 
     Promise.all([getQuestion(id), getAnswers(id)])
       .then(([questionData, answerData]) => {
-        if(!isActive) return
+        if (!isActive) return
         setQuestion(questionData)
         setAnswers(answerData)
       })
       .catch((fetchError) => {
-        if(!isActive) return
+        if (!isActive) return
         if (fetchError.response?.status !== 404) {
           setLoadError(getErrorMessage(fetchError))
         }
@@ -45,15 +64,66 @@ function QuestionDetailContent({ id }) {
         if (isActive) setIsLoading(false)
       })
 
-      return () => {
-        isActive = false
-      }
+    return () => {
+      isActive = false
+    }
   }, [id])
+
+  /**
+   * Saves an answer and adds the returned record to the displayed list.
+   * Keeps the draft if submission fails.
+   */
+  async function handlePostAnswer(event) {
+    event.preventDefault()
+
+    if (isPostingAnswer) return
+
+    setAnswerError('')
+    setAnswerPosted(false)
+
+    if (!user) {
+      setAnswerError('Please log in to post an answer.')
+      return
+    }
+
+    const description = answerText.trim()
+
+    if (!description) {
+      setAnswerError('Please write an answer before posting.')
+      return
+    }
+
+    setIsPostingAnswer(true)
+
+    try {
+      const savedAnswer = await createAnswer(id, description)
+
+      // Match the backend ordering: most upvotes, then oldest first.
+      setAnswers((previous) =>
+        [...previous, savedAnswer].sort(
+          (a, b) =>
+            b.upvotes - a.upvotes ||
+            new Date(a.createdAt) - new Date(b.createdAt),
+        ),
+      )
+
+      setAnswerText('')
+      setAnswerPosted(true)
+    } catch (error) {
+      setAnswerError(getErrorMessage(error))
+    } finally {
+      setIsPostingAnswer(false)
+    }
+  }
 
   if (isLoading) {
     return (
-      <Container component="main" maxWidth="md" sx={{ py: 6, textAlign: 'center'}}>
-        <CircularProgress/>
+      <Container
+        component="main"
+        maxWidth="md"
+        sx={{ py: 6, textAlign: 'center' }}
+      >
+        <CircularProgress />
       </Container>
     )
   }
@@ -70,7 +140,7 @@ function QuestionDetailContent({ id }) {
       </Container>
     )
   }
-  
+
   // Show a fallback page if the question does not exist.
   if (!question) {
     return (
@@ -82,7 +152,6 @@ function QuestionDetailContent({ id }) {
         <Button component={RouterLink} to="/" sx={{ textTransform: 'none' }}>
           ← Back to all questions
         </Button>
-
       </Container>
     )
   }
@@ -95,12 +164,12 @@ function QuestionDetailContent({ id }) {
 
   // use the first letters of up to two names for authors avatar.
   const authorInitials = authorName
-     .trim()
-     .split(/\s+/)
-     .slice(0, 2)
-     .map((name) => name[0])
-     .join('')
-     .toUpperCase()
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((name) => name[0])
+    .join('')
+    .toUpperCase()
 
   // Display the date in a short format, such as "20 Sept".
   const formattedDate = new Date(question.createdAt).toLocaleDateString(
@@ -131,15 +200,14 @@ function QuestionDetailContent({ id }) {
           bgcolor: 'background.paper',
         }}
       >
-
         {/* Course name and answer status */}
         <Stack
           direction="row"
-          sx={{ 
+          sx={{
             mb: 2,
             alignItems: 'center',
             justifyContent: 'space-between',
-         }}
+          }}
         >
           <Typography
             variant="body2"
@@ -160,8 +228,8 @@ function QuestionDetailContent({ id }) {
           />
         </Stack>
 
-        <Typography 
-          component="h1" 
+        <Typography
+          component="h1"
           sx={{
             mb: 3,
             fontSize: '1.875rem',
@@ -178,10 +246,10 @@ function QuestionDetailContent({ id }) {
         <Stack
           direction="row"
           spacing={1.5}
-          sx={{ 
+          sx={{
             mb: 3,
-            alignItems:'center',
-           }}
+            alignItems: 'center',
+          }}
         >
           <Avatar
             sx={{
@@ -223,19 +291,115 @@ function QuestionDetailContent({ id }) {
         </Typography>
       </Paper>
       {/* Answers */}
-      <Stack spacing={2} sx={{ mt: 4}}>
+      <Stack spacing={2} sx={{ mt: 4 }}>
         <Typography component="h2" variant="h6">
           {answers.length} {answers.length === 1 ? 'Answer' : 'Answers'}
         </Typography>
-        
+
         {answers.length === 0 ? (
           <Typography color="text.secondary">
             No answers yet - be the first to help.
           </Typography>
         ) : (
-          answers.map((answer) => <AnswerCard key={answer._id} answer={answer}/>)
+          answers.map((answer) => (
+            <AnswerCard key={answer._id} answer={answer} />
+          ))
         )}
       </Stack>
+
+      {/* Write and submit an answer below the existing answers. */}
+      <Paper
+        component="form"
+        onSubmit={handlePostAnswer}
+        variant="outlined"
+        sx={{
+          mt: 3,
+          p: 3.5,
+          borderRadius: 3,
+          borderColor: '#e2e8f0',
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Typography
+          component="h2"
+          variant="h6"
+          sx={{ mb: 2.5, fontWeight: 700 }}
+        >
+          Share what you know
+        </Typography>
+
+        <TextField
+          id="answer-description"
+          label="Your answer"
+          value={answerText}
+          disabled={!user || isPostingAnswer}
+          onChange={(event) => {
+            setAnswerText(event.target.value)
+            setAnswerError('')
+            setAnswerPosted(false)
+          }}
+          multiline
+          rows={5}
+          required
+          fullWidth
+          helperText="Explain your reasoning and keep it constructive."
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+            },
+          }}
+        />
+
+        {/* Guests can read answers, but must log in to post one. */}
+        {!user && (
+          <Alert
+            severity="info"
+            sx={{ mt: 2 }}
+            action={
+              <Button component={RouterLink} to="/login" color="inherit">
+                Log in
+              </Button>
+            }
+          >
+            Log in to share an answer.
+          </Alert>
+        )}
+
+        {answerError && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {answerError}
+          </Alert>
+        )}
+
+        {answerPosted && (
+          <Alert severity="success" sx={{ mt: 2 }}>
+            Your answer has been posted.
+          </Alert>
+        )}
+
+        <Stack direction="row" sx={{ mt: 2.5, justifyContent: 'flex-end' }}>
+          {/* Prevent empty answers and repeated clicks while saving. */}
+          <Button
+            type="submit"
+            variant="contained"
+            disableElevation
+            disabled={!user || isPostingAnswer || !answerText.trim()}
+            sx={{
+              px: 2.5,
+              py: 1.25,
+              borderRadius: 2.5,
+              textTransform: 'none',
+              fontWeight: 700,
+              bgcolor: '#373ee5',
+              '&:hover': {
+                bgcolor: '#2c32bd',
+              },
+            }}
+          >
+            {isPostingAnswer ? 'Posting…' : 'Post answer'}
+          </Button>
+        </Stack>
+      </Paper>
     </Container>
   )
 }

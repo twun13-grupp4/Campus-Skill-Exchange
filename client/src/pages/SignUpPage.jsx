@@ -36,9 +36,9 @@ function SignUpPage() {
   const [isLoadingOptions, setIsLoadingOptions] = useState(true)
   const [optionsError, setOptionsError] = useState('')
 
-  // Only show programs belonging to the selected school.
-  const availablePrograms = programs.filter(
-    (item) => item.school._id === school,
+  // Only show programs offered at the selected school.
+  const availablePrograms = programs.filter((item) =>
+    item.schools.some((offeredAt) => offeredAt._id === school),
   )
 
   // Load dropdown options when the signup page opens.

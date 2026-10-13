@@ -1,4 +1,11 @@
-import { Alert, CircularProgress, Container, Grid, Stack, Typography } from '@mui/material'
+import {
+  Alert,
+  CircularProgress,
+  Container,
+  Grid,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { getQuestions } from '../api/questions'
 import { getErrorMessage } from '../api/client'
@@ -16,26 +23,41 @@ function HomePage({ children }) {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
+  // Search through the API after the user pauses typing for 300 ms.
   useEffect(() => {
     let isActive = true
 
-    getQuestions()
-      .then((data) => {
-        if (!isActive) return
-        setQuestions(data)
-      })
-      .catch((fetchError) => {
-        if(!isActive) return
-        setLoadError(getErrorMessage(fetchError))
-      })
-      .finally(() => {
-        if (isActive) setIsLoading(false)
-      })
+    const timeoutId = setTimeout(async () => {
+      setIsLoading(true)
+      setLoadError('')
 
-      return () => {
-        isActive = false
+      try {
+        const search = searchQuery.trim()
+
+        // An empty search loads all questions.
+        // MongoDB handles matching titles and descriptions.
+        const data = await getQuestions(search ? { search } : {})
+
+        if (isActive) {
+          setQuestions(data)
+        }
+      } catch (error) {
+        if (isActive) {
+          setLoadError(getErrorMessage(error))
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
       }
-  }, [])
+    }, 300)
+
+    // Cancel a pending search and ignore outdated responses.
+    return () => {
+      isActive = false
+      clearTimeout(timeoutId)
+    }
+  }, [searchQuery])
 
   return (
     <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
@@ -55,7 +77,7 @@ function HomePage({ children }) {
       </Stack>
 
       {isLoading && (
-        <Stack sx={{ mt: 4, alignItems: 'center'}}>
+        <Stack sx={{ mt: 4, alignItems: 'center' }}>
           <CircularProgress />
         </Stack>
       )}
@@ -66,9 +88,12 @@ function HomePage({ children }) {
         </Alert>
       )}
 
+      {/* Distinguish an unsuccessful search from an empty question list. */}
       {!isLoading && !loadError && questions.length === 0 && (
-        <Typography color="text.secondary" sx={{ mt: 4 }}>
-          No questions yet - be the first to ask one.
+        <Typography role="status" color="text.secondary" sx={{ mt: 4 }}>
+          {searchQuery.trim()
+            ? 'No matching questions. Try another word from the title or description.'
+            : 'No questions yet — be the first to ask one.'}
         </Typography>
       )}
 
@@ -81,7 +106,6 @@ function HomePage({ children }) {
           ))}
         </Grid>
       )}
-
     </Container>
   )
 }

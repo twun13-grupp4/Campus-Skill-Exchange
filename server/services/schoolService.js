@@ -12,23 +12,23 @@ const toPublicSchool = (school) => ({
 })
 
 /**
- * Shape sent to the client for a program or course. Expects `school` to be populated.
+ * Shape sent to the client for a program. Expects `schools` to be populated.
+ * A program is shared: the same program can be offered at several schools.
  */
-const toPublicSchoolItem = (item) => ({
-  _id: item._id,
-  name: item.name,
-  school: { _id: item.school._id, name: item.school.name },
+const toPublicProgram = (program) => ({
+  _id: program._id,
+  name: program.name,
+  schools: program.schools.map(toPublicSchool),
 })
 
 /**
- * Filter for programs/courses, optionally limited to one school.
- * Returns null for an invalid school id, so the caller can answer with an empty list.
+ * Shape sent to the client for a course. Expects `school` to be populated.
  */
-const schoolFilter = (school) => {
-  if (!school) return {}
-  if (!mongoose.isValidObjectId(school)) return null
-  return { school }
-}
+const toPublicCourse = (course) => ({
+  _id: course._id,
+  name: course.name,
+  school: toPublicSchool(course.school),
+})
 
 /**
  * All schools, sorted by name.
@@ -39,27 +39,34 @@ const listSchools = async () => {
 }
 
 /**
- * All programs, optionally only the ones at one school, sorted by name.
+ * All programs, optionally only the ones offered at one school, sorted by name.
+ * An invalid school id gives an empty list instead of an error.
  */
 const listPrograms = async ({ school } = {}) => {
-  const filter = schoolFilter(school)
-  if (!filter) return []
+  const filter = {}
+  if (school) {
+    if (!mongoose.isValidObjectId(school)) return []
+    // matches programs whose schools list contains this school
+    filter.schools = school
+  }
 
   const programs = await Program.find(filter)
-    .populate('school', 'name')
+    .populate('schools', 'name')
     .sort({ name: 1 })
     .lean()
-  return programs.map(toPublicSchoolItem)
+  return programs.map(toPublicProgram)
 }
 
 /**
  * All courses, optionally only the ones at one school and/or in one program,
- * sorted by name.
+ * sorted by name. An invalid id gives an empty list instead of an error.
  */
 const listCourses = async ({ school, program } = {}) => {
-  const filter = schoolFilter(school)
-  if (!filter) return []
-
+  const filter = {}
+  if (school) {
+    if (!mongoose.isValidObjectId(school)) return []
+    filter.school = school
+  }
   if (program) {
     if (!mongoose.isValidObjectId(program)) return []
     // matches courses whose programs list contains this program
@@ -70,11 +77,11 @@ const listCourses = async ({ school, program } = {}) => {
     .populate('school', 'name')
     .sort({ name: 1 })
     .lean()
-  return courses.map(toPublicSchoolItem)
+  return courses.map(toPublicCourse)
 }
 
 /**
- * True if the program exists and belongs to the school.
+ * True if the program exists and is offered at the school.
  */
 const isValidSchoolProgram = async (schoolId, programId) => {
   if (
@@ -83,7 +90,7 @@ const isValidSchoolProgram = async (schoolId, programId) => {
   ) {
     return false
   }
-  const match = await Program.exists({ _id: programId, school: schoolId })
+  const match = await Program.exists({ _id: programId, schools: schoolId })
   return Boolean(match)
 }
 

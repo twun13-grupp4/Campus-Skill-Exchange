@@ -1,34 +1,76 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import {
   Alert,
+  Autocomplete,
   Button,
   Container,
   Stack,
   TextField,
   Typography,
 } from '@mui/material'
+import { getCourses } from '../api/schools' //hämta kurser
+import { createQuestion } from '../api/questions' //spara frågan
+import { getErrorMessage } from '../api/client' //visar servers fel
+import { getToken } from '../api/token' //kollar inloggnigne
 
-//titel-fätet
+/**
+ * Sida där en inloggad användare ställer en fråga i en kurs.
+ * Kurserna hämtas från servern, frågan sparas med POST /api/questions.
+ */
 function AskQuestionPage() {
+  const navigate = useNavigate()
+
   const [title, setTitle] = useState('')
-
-  //kurs-fätet
-  const [courseTag, setCourseTag] = useState('')
-
-  //beskrivningsfältet
   const [description, setDescription] = useState('')
+  const [course, setCourse] = useState(null) // vald kurs { _id, name, school }
+  const [courses, setCourses] = useState([]) // alla kurser från servern
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  //håller koll om formuläret har skickats in
-  const [submitted, setSubmitted] = useState(false)
+  // hämtar kurserna en gång när sidan laddas
+  useEffect(() => {
+    getCourses()
+      .then(setCourses)
+      .catch((loadError) => setError(getErrorMessage(loadError)))
+  }, [])
 
-  //stoppar webbläsaren att ladd om vid submit
-  const handleSubmit = (event) => {
-    event.preventDefault()
+  /**
+   * Skickar frågan till servern och går till den nya frågan,
+   * eller visar serverns felmeddelande om något går fel.
+   */
+  const handleSubmit = async (event) => {
+    event.preventDefault() // stoppar att sidan laddas om
+    setError('')
+    setIsSubmitting(true)
 
-    //mock
-    console.log({ title, courseTag, description })
+    try {
+      // bara kursens id skickas, servern tar reda på skolan själv
+      const created = await createQuestion({
+        title,
+        description,
+        course: course?._id,
+      })
+      navigate(`/questions/${created._id}`)
+    } catch (submitError) {
+      setError(getErrorMessage(submitError))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
-    setSubmitted(true)
+  // inte inloggad -> visa länk till login i stället för formuläret
+  if (!getToken()) {
+    return (
+      <Container component="main" maxWidth="sm" sx={{ py: 4 }}>
+        <Alert severity="info" sx={{ mb: 2 }}>
+          You need to log in to ask a question.
+        </Alert>
+        <Button component={RouterLink} to="/login" variant="contained">
+          Log in
+        </Button>
+      </Container>
+    )
   }
 
   return (
@@ -51,12 +93,16 @@ function AskQuestionPage() {
           fullWidth
         />
 
-        <TextField
-          label="Course"
-          value={courseTag}
-          onChange={(e) => setCourseTag(e.target.value)}
-          required
-          fullWidth
+        {/* sökbar kurslista, visar "Kurs – Skola" */}
+        <Autocomplete
+          options={courses}
+          value={course}
+          onChange={(_, value) => setCourse(value)}
+          getOptionLabel={(option) => `${option.name} – ${option.school.name}`}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          renderInput={(params) => (
+            <TextField {...params} label="Course" required />
+          )}
         />
 
         <TextField
@@ -65,19 +111,16 @@ function AskQuestionPage() {
           onChange={(e) => setDescription(e.target.value)}
           multiline
           rows={4}
+          required
           fullWidth
         />
 
-        <Button type="submit" variant="contained">
-          Submit
-        </Button>
+        {error && <Alert severity="error">{error}</Alert>}
 
-        {submitted && (
-          // visas bara efter att formuläret skickats in
-          <Alert severity="success">
-            Question submitted (mock only, not saved yet)
-          </Alert>
-        )}
+        {/* avstängd medan frågan skickas, så man inte postar två gånger */}
+        <Button type="submit" variant="contained" disabled={isSubmitting}>
+          {isSubmitting ? 'Posting…' : 'Post question'}
+        </Button>
       </Stack>
     </Container>
   )

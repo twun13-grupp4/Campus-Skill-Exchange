@@ -4,7 +4,7 @@
 
 ## Project description
 
-A web application for university students to exchange skills and knowledge with each other. Students ask and answer questions tied to a course; courses and programs can be shared across schools, so students on the same program at different universities see the same questions.
+A web application for university students to exchange skills and knowledge with each other. Students ask and answer questions tied to a course; programs are shared across schools, so students on the same program at different universities see each other's questions.
 
 ## Structure
 
@@ -28,7 +28,7 @@ Runs at http://localhost:5173
 
 **Server**
 
-The database is a shared [MongoDB Atlas](https://www.mongodb.com/atlas) cluster. Copy `server/.env.example` to `server/.env` and fill in the values (get `MONGODB_URI` from the team; `JWT_SECRET` can be any random string, but must be the same for everyone talking to the shared database so tokens stay valid for each other). `.env` is gitignored — never commit it.
+The database is a shared [MongoDB Atlas](https://www.mongodb.com/atlas) cluster. Copy `server/.env.example` to `server/.env` and fill in the values (get `MONGODB_URI` from the team; `JWT_SECRET` can be any long random string). `.env` is gitignored — never commit it.
 
 ```bash
 cd server
@@ -65,7 +65,7 @@ Wipes and reseeds the shared database (schools, programs, courses, users, questi
 | GET | `/api/users/me` | ✓ | Current user's profile |
 | GET | `/api/schools` | – | List schools |
 | GET | `/api/programs?school=<id>` | – | List programs, optionally filtered by school |
-| GET | `/api/courses?school=<id>` | – | List courses, optionally filtered by school |
+| GET | `/api/courses?school=<id>&program=<id>` | – | List courses, optionally filtered by school and/or program |
 | GET | `/api/questions?school=&program=&course=&status=&search=` | – | List questions, with optional filters/search |
 | GET | `/api/questions/:id` | – | Get a single question |
 | POST | `/api/questions` | ✓ | Ask a question |

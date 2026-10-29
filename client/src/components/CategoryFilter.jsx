@@ -34,7 +34,10 @@ function CategoryFilter({ onChange }) {
   useEffect(() => {
     let isActive = true
 
-    Promise.all([getPrograms(school?._id), getCourses(school?._id, program?._id)])
+    Promise.all([
+      getPrograms(school?._id),
+      getCourses(school?._id, program?._id),
+    ])
       .then(([programsData, coursesData]) => {
         if (!isActive) return
         setPrograms(programsData)

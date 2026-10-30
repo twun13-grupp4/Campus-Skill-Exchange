@@ -64,6 +64,27 @@ Wipes and reseeds the shared database (schools, programs, courses, users, questi
 | lina@test.se | password123 | student |
 | moa@test.se | password123 | moderator |
 
+## Testing
+
+**Automated API tests** (Jest + Supertest):
+
+```bash
+cd server
+npm test
+```
+
+The tests run against a temporary in-memory MongoDB (`mongodb-memory-server`), so they never touch the shared database and need no `.env`. The first run downloads a MongoDB binary. They also run in CI on every pull request.
+
+They cover the core features end to end through the API: registration and login, listing/filtering/searching and asking questions, answering and the notifications it creates, profile editing, and the delete permissions (author vs. other user vs. moderator).
+
+**Manual testing** of the UI before each hand-in:
+
+- Refresh the browser on every route (`/`, `/questions/:id`, `/ask`, `/login`, `/signup`, `/profile`) and check it comes back the same
+- Check the layout at phone width and on desktop
+- Sign up, log in, log out, and check that `/ask` and `/profile` require login
+- Ask, answer and delete as different users (including `moa@test.se`), and check the notification bell
+- ESLint passes in `client/` and `server/` (`npm run lint`)
+
 ## Deploy
 
 From the project root, with `server/.env` in place:

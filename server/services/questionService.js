@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Question = require('../models/Question')
 const Course = require('../models/Course')
+const Answer = require('../models/Answer')
 require('../models/School') // registers the models so populate() can find them
 require('../models/User')
 
@@ -129,4 +130,26 @@ const createQuestion = async ({ title, description, course }, user) => {
   return toPublicQuestion(question)
 }
 
-module.exports = { listQuestions, getQuestion, createQuestion }
+/**
+ * Just the author id of a question, for the delete permission check in
+ * requireOwnerOrModerator. Assumes a valid id (checked by the caller).
+ */
+const getQuestionAuthor = (id) => Question.findById(id).select('author')
+
+/**
+ * Deletes a question and its answers, so no orphaned answers are left
+ * pointing at a question that no longer exists. Permission (author or
+ * moderator) is already checked by requireOwnerOrModerator before this runs.
+ */
+const deleteQuestion = async (id) => {
+  await Answer.deleteMany({ question: id })
+  await Question.findByIdAndDelete(id)
+}
+
+module.exports = {
+  listQuestions,
+  getQuestion,
+  createQuestion,
+  getQuestionAuthor,
+  deleteQuestion,
+}

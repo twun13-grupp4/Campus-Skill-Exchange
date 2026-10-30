@@ -50,4 +50,19 @@ const createAnswer = async (req, res) => {
   }
 }
 
-module.exports = { getAnswersByQuestion, createAnswer }
+/**
+ * DELETE /api/answers/:id
+ * Removes the answer. Allowed for the author or a moderator (enforced by
+ * requireOwnerOrModerator before this runs).
+ */
+const deleteAnswer = async (req, res) => {
+  try {
+    await answerService.deleteAnswer(req.params.id)
+    res.status(204).end()
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Could not delete answer' })
+  }
+}
+
+module.exports = { getAnswersByQuestion, createAnswer, deleteAnswer }

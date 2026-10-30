@@ -49,3 +49,11 @@ export const createAnswer = async (questionId, description) => {
   })
   return response.data
 }
+
+/**
+ * DELETE /questions/:id (kräver inloggning + rättighet)
+ * Tar bort frågan och dess svar.
+ */
+export const deleteQuestion = async (id) => {
+  await client.delete(`/questions/${id}`)
+}

@@ -10,12 +10,18 @@ import {
   Alert,
   TextField,
 } from '@mui/material'
-import { Link as RouterLink, useParams } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getQuestion, getAnswers, createAnswer } from '../api/questions'
+import {
+  getQuestion,
+  getAnswers,
+  createAnswer,
+  deleteQuestion,
+} from '../api/questions'
 import { getErrorMessage } from '../api/client'
 import AnswerCard from '../components/AnswerCard'
 import { useAuth } from '../AuthContext'
+import { canDelete } from '../utils/permissions'
 
 /**
  * Reads the id from the URL and remounts QuestionDetailContent whenever it
@@ -31,10 +37,13 @@ function QuestionDetailPage() {
  * Displays a question's course, status, author, date, and description.
  */
 function QuestionDetailContent({ id }) {
+  const navigate = useNavigate()
   const [question, setQuestion] = useState(null)
   const [answers, setAnswers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
   // Store the answer draft while the user writes.
   const [answerText, setAnswerText] = useState('')
   const { user } = useAuth()
@@ -113,6 +122,23 @@ function QuestionDetailContent({ id }) {
       setAnswerError(getErrorMessage(error))
     } finally {
       setIsPostingAnswer(false)
+    }
+  }
+
+  /** Deletes the question (author or moderator only) and returns home. */
+  async function handleDeleteQuestion() {
+    if (isDeleting) return
+    if (!window.confirm('Delete this question? This cannot be undone.')) return
+
+    setIsDeleting(true)
+    setDeleteError('')
+
+    try {
+      await deleteQuestion(id)
+      navigate('/', { replace: true })
+    } catch (error) {
+      setDeleteError(getErrorMessage(error))
+      setIsDeleting(false)
     }
   }
 
@@ -216,17 +242,37 @@ function QuestionDetailContent({ id }) {
             {courseName}
           </Typography>
 
-          <Chip
-            label={isAnswered ? '✓ Answered' : 'Unanswered'}
-            size="small"
-            sx={{
-              borderRadius: 1,
-              bgcolor: isAnswered ? '#edf7f0' : '#f1f3f8',
-              color: isAnswered ? '#288057' : '#64748b',
-              fontSize: '0.75rem',
-            }}
-          />
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+            <Chip
+              label={isAnswered ? '✓ Answered' : 'Unanswered'}
+              size="small"
+              sx={{
+                borderRadius: 1,
+                bgcolor: isAnswered ? '#edf7f0' : '#f1f3f8',
+                color: isAnswered ? '#288057' : '#64748b',
+                fontSize: '0.75rem',
+              }}
+            />
+
+            {canDelete(user, question.author) && (
+              <Button
+                size="small"
+                color="error"
+                onClick={handleDeleteQuestion}
+                disabled={isDeleting}
+                sx={{ textTransform: 'none' }}
+              >
+                {isDeleting ? 'Deleting…' : 'Delete'}
+              </Button>
+            )}
+          </Stack>
         </Stack>
+
+        {deleteError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {deleteError}
+          </Alert>
+        )}
 
         <Typography
           component="h1"
@@ -302,7 +348,15 @@ function QuestionDetailContent({ id }) {
           </Typography>
         ) : (
           answers.map((answer) => (
-            <AnswerCard key={answer._id} answer={answer} />
+            <AnswerCard
+              key={answer._id}
+              answer={answer}
+              onDelete={(deletedId) =>
+                setAnswers((previous) =>
+                  previous.filter((item) => item._id !== deletedId),
+                )
+              }
+            />
           ))
         )}
       </Stack>

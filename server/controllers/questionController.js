@@ -72,4 +72,24 @@ const createQuestion = async (req, res) => {
   }
 }
 
-module.exports = { getQuestions, getQuestionById, createQuestion }
+/**
+ * DELETE /api/questions/:id
+ * Removes the question and its answers. Allowed for the author or a
+ * moderator (enforced by requireOwnerOrModerator before this runs).
+ */
+const deleteQuestion = async (req, res) => {
+  try {
+    await questionService.deleteQuestion(req.params.id)
+    res.status(204).end()
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Could not delete question' })
+  }
+}
+
+module.exports = {
+  getQuestions,
+  getQuestionById,
+  createQuestion,
+  deleteQuestion,
+}

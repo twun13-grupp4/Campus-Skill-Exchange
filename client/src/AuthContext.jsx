@@ -74,6 +74,11 @@ export function AuthProvider({ children }) {
     setAuthError('')
   }
 
+  /** Replace the shared user after a profile update (no new session/token). */
+  function updateUser(updatedUser) {
+    setUser(updatedUser)
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -82,6 +87,7 @@ export function AuthProvider({ children }) {
         authError,
         startSession,
         endSession,
+        updateUser,
       }}
     >
       {children}

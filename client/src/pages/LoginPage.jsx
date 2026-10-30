@@ -29,6 +29,13 @@ function LoginPage() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+
+  /**
+ * Handles the login form submission.
+ * Sends the user's credentials to the backend.
+ * On success, updates the authentication state and redirects home.
+ * On failure, displays an error message.
+ */
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')

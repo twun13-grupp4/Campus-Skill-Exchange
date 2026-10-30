@@ -55,6 +55,7 @@ Wipes and reseeds the shared database (schools, programs, courses, users, questi
 | sara@test.se | password123 | teacher |
 | omar@test.se | password123 | student |
 | lina@test.se | password123 | student |
+| moa@test.se | password123 | moderator |
 
 ## Deploy
 

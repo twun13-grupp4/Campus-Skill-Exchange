@@ -1,10 +1,12 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getNotifications, markNotificationRead } from '../api/notifications'
 import { useAuth } from '../AuthContext'
 import Logo from './Logo'
 import {
   AppBar,
   Avatar,
+  Badge,
   Button,
   Container,
   IconButton,
@@ -23,9 +25,9 @@ import {
 } from '@mui/material'
 
 /**
- * Displays the logged-in user's profile and account navigation.
+ * Displays the logged-in user's profile, notifications and account navigation.
  * Both logout buttons clear the session and return to the homepage.
- * Notifications, profile, and messages are not connected yet.
+ * Messages are not connected yet.
  */
 function DashboardNavbar() {
   // Store the clicked profile button so the menu opens beneath it.
@@ -33,9 +35,20 @@ function DashboardNavbar() {
   const isProfileOpen = Boolean(profileAnchor)
   // Control whether the sidebar is visible.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  // Notiser från servern, och knappen som notislistan öppnas under
+  const [notifications, setNotifications] = useState([])
+  const [notificationAnchor, setNotificationAnchor] = useState(null)
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   const { user, endSession } = useAuth()
   const navigate = useNavigate()
+
+  // hämtar notiser en gång när sidan laddas
+  useEffect(() => {
+    getNotifications()
+      .then(setNotifications)
+      .catch(() => setNotifications([])) // fel ska inte krascha navbaren
+  }, [])
 
   // Build the avatar initials from the logged-in user's name.
   const initials = user.name
@@ -57,6 +70,33 @@ function DashboardNavbar() {
     setIsSidebarOpen(false)
     endSession()
     navigate('/', { replace: true })
+  }
+
+  /** Opens the notification list and fetches the latest notifications. */
+  function openNotifications(event) {
+    setNotificationAnchor(event.currentTarget)
+    getNotifications()
+      .then(setNotifications)
+      .catch(() => {})
+  }
+
+  /** Marks a notification as read and opens its question. */
+  function handleNotificationClick(notification) {
+    setNotificationAnchor(null)
+
+    if (!notification.read) {
+      markNotificationRead(notification._id).catch(() => {})
+      // uppdatera direkt så badgen minskar utan att vänta på servern
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n._id === notification._id ? { ...n, read: true } : n,
+        ),
+      )
+    }
+
+    if (notification.question) {
+      navigate(`/questions/${notification.question._id}`)
+    }
   }
 
   return (
@@ -102,18 +142,20 @@ function DashboardNavbar() {
               Ask a question
             </Button>
 
-            {/* Notification indicator; clicking has no action yet. */}
-            <IconButton aria-label="Notifications">
-              <SvgIcon>
-                <path
-                  d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </SvgIcon>
+            {/* Bell with the number of unread notifications. */}
+            <IconButton aria-label="Notifications" onClick={openNotifications}>
+              <Badge badgeContent={unreadCount} color="error">
+                <SvgIcon>
+                  <path
+                    d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </SvgIcon>
+              </Badge>
             </IconButton>
 
             {/* Open the profile dropdown beneath the avatar. */}
@@ -231,6 +273,44 @@ function DashboardNavbar() {
           <MenuItem onClick={handleLogout} sx={{ py: 1.25 }}>
             Log out
           </MenuItem>
+        </Menu>
+
+        {/* Notification list; unread ones are bold. */}
+        <Menu
+          anchorEl={notificationAnchor}
+          open={Boolean(notificationAnchor)}
+          onClose={() => setNotificationAnchor(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          slotProps={{
+            paper: {
+              sx: {
+                mt: 1,
+                width: 300,
+                borderRadius: 2,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
+              },
+            },
+          }}
+        >
+          {notifications.length === 0 ? (
+            <MenuItem disabled>No notifications yet</MenuItem>
+          ) : (
+            notifications.map((n) => (
+              <MenuItem
+                key={n._id}
+                onClick={() => handleNotificationClick(n)}
+                sx={{
+                  py: 1.25,
+                  whiteSpace: 'normal',
+                  fontWeight: n.read ? 400 : 700,
+                }}
+              >
+                New answer on "{n.question?.title}"
+              </MenuItem>
+            ))
+          )}
         </Menu>
 
         {/* Sidebar navigation; only logout is connected so far. */}

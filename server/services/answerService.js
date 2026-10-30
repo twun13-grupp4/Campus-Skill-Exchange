@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Answer = require('../models/Answer')
 const Question = require('../models/Question')
+const Notification = require('../models/Notification')
 require('../models/User') //laddar user modellen
 
 /**
@@ -45,15 +46,25 @@ const listAnswers = async (questionId) => {
 const createAnswer = async (questionId, description, user) => {
   if (!mongoose.isValidObjectId(questionId)) return null
 
-  //kolla om frågan finns
-  const exist = await Question.exists({ _id: questionId })
-  if (!exist) return null
+  //hämta frågan, behöver author för notisen
+  const question = await Question.findById(questionId).select('author')
+  if (!question) return null
 
   const answer = await Answer.create({
     question: questionId,
     description,
-    author: user._id, //tas från token som ingen kan svara i annans namn
+    author: user._id, //tas från token så ingen kan svara i annans namn
   })
+
+  //notis till frågans författare, inte om man svarar på sin egen fråga
+  if (!question.author.equals(user._id)) {
+    await Notification.create({
+      recipient: question.author,
+      type: 'answer',
+      question: question._id,
+      answer: answer._id,
+    })
+  }
 
   //create() ger bara author-id, hämta namnet så svaret se likadant ut som i listan
   await answer.populate('author', 'name')

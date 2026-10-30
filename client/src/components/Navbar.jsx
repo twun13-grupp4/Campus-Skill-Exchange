@@ -4,6 +4,11 @@ import DashboardNavbar from './DashboardNavbar'
 import { useAuth } from '../AuthContext'
 import Logo from './Logo'
 
+/**
+ * Top navigation bar.
+ * Shows the DashboardNavbar for logged-in users, otherwise the public bar
+ * with log in and sign up links.
+ */
 function Navbar() {
   const { user } = useAuth()
 

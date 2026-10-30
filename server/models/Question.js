@@ -1,3 +1,7 @@
+/**
+ * Question model. Asked by a user about a course.
+ * school is copied from the course so questions can be filtered by school directly.
+ */
 const mongoose = require('mongoose')
 
 const questionSchema = new mongoose.Schema(

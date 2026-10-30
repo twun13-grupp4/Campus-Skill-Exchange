@@ -1,3 +1,6 @@
+/**
+ * Routes for /api/schools (public).
+ */
 const express = require('express')
 
 const router = express.Router()

@@ -1,3 +1,6 @@
+/**
+ * Routes for /api/notifications. All routes require login.
+ */
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth') //kollar inlogg
 const {

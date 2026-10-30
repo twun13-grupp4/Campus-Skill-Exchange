@@ -1,3 +1,6 @@
+/**
+ * Program model. One shared entry per program name, offered by one or more schools.
+ */
 const mongoose = require('mongoose')
 
 const programSchema = new mongoose.Schema(

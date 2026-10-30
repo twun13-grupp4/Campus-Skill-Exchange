@@ -1,3 +1,7 @@
+/**
+ * Course model. Belongs to one school and can be part of several programs.
+ * Course names are unique per school.
+ */
 const mongoose = require('mongoose')
 
 const courseSchema = new mongoose.Schema(

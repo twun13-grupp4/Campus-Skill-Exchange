@@ -16,6 +16,10 @@ import { login } from '../api/users'
 import { getErrorMessage } from '../api/client'
 import { useAuth } from '../AuthContext'
 
+/**
+ * Login form. On success it starts the session (token + user in AuthContext)
+ * and goes to the homepage; on failure it shows the server's error message.
+ */
 function LoginPage() {
   const navigate = useNavigate()
   const { startSession } = useAuth()

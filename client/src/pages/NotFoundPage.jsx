@@ -1,6 +1,7 @@
 import { Button, Container, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 
+/** Shown for any route that doesn't exist, with a link back to the homepage. */
 function NotFoundPage() {
   return (
     <Container component="main" maxWidth="md" sx={{ py: 4 }}>

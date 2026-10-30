@@ -1,3 +1,6 @@
+/**
+ * School model. Schools offer programs and courses.
+ */
 const mongoose = require('mongoose')
 
 const schoolSchema = new mongoose.Schema(

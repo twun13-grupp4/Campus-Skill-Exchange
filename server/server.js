@@ -1,3 +1,8 @@
+/**
+ * Entry point for the Express server.
+ * Mounts the API routes under /api, serves the built client (client/dist) with
+ * a fallback to index.html for deep links, and starts listening once MongoDB is connected.
+ */
 require('dotenv/config') // läser in variablerna från .env till process.env
 const fs = require('fs')
 const path = require('path')

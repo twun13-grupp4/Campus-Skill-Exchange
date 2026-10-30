@@ -22,6 +22,9 @@ app.use('/api/programs', programRoutes)
 const courseRoutes = require('./routes/courseRoutes') //kurser, kan filtreras på skola
 app.use('/api/courses', courseRoutes)
 
+const answerRoutes = require('./routes/answerRoutes') //svar, bara DELETE just nu
+app.use('/api/answers', answerRoutes)
+
 const PORT = process.env.PORT || 3000 //http://localhost:3000
 
 // starta servern först när databasen är ansluten

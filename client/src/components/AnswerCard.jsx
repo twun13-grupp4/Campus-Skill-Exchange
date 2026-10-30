@@ -1,9 +1,18 @@
-import { Avatar, Paper, Stack, Typography } from '@mui/material'
+import { Alert, Avatar, Button, Paper, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
+import { useAuth } from '../AuthContext'
+import { canDelete } from '../utils/permissions'
+import { deleteAnswer } from '../api/answers'
+import { getErrorMessage } from '../api/client'
 
 /**
  * Displays one answer's author, date, upvotes, and description.
  */
-function AnswerCard({ answer }) {
+function AnswerCard({ answer, onDelete }) {
+  const { user } = useAuth()
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
   const authorName = answer.author?.name ?? 'Deleted user'
 
   //use first letter of up to two names for the authors avatar.
@@ -20,6 +29,22 @@ function AnswerCard({ answer }) {
     day: 'numeric',
     month: 'short',
   })
+
+  async function handleDelete() {
+    if (isDeleting) return
+    if (!window.confirm('Delete this answer? This cannot be undone.')) return
+
+    setIsDeleting(true)
+    setDeleteError('')
+
+    try {
+      await deleteAnswer(answer._id)
+      onDelete?.(answer._id)
+    } catch (error) {
+      setDeleteError(getErrorMessage(error))
+      setIsDeleting(false)
+    }
+  }
 
   return (
     <Paper
@@ -59,6 +84,18 @@ function AnswerCard({ answer }) {
         >
           {answer.upvotes} {answer.upvotes === 1 ? 'upvote' : 'upvotes'}
         </Typography>
+
+        {canDelete(user, answer.author) && (
+          <Button
+            size="small"
+            color="error"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            sx={{ textTransform: 'none' }}
+          >
+            {isDeleting ? 'Deleting…' : 'Delete'}
+          </Button>
+        )}
       </Stack>
 
       <Typography
@@ -73,6 +110,12 @@ function AnswerCard({ answer }) {
       >
         {answer.description}
       </Typography>
+
+      {deleteError && (
+        <Alert severity="error" sx={{ mt: 1.5 }}>
+          {deleteError}
+        </Alert>
+      )}
     </Paper>
   )
 }

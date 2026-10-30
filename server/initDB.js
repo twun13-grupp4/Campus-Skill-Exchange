@@ -149,6 +149,15 @@ const initDB = async () => {
       school: ju._id,
       program: hingData._id,
     },
+    {
+      // moderator kan ta bort alla frågor och svar
+      name: 'Moa',
+      email: 'moa@test.se',
+      password: 'password123',
+      school: ju._id,
+      program: hingData._id,
+      role: 'moderator',
+    },
   ])
 
   // skapa frågor, author = id:t från användarna ovan

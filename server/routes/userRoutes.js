@@ -1,3 +1,6 @@
+/**
+ * Routes for /api/users: register, login and the logged-in user's profile.
+ */
 const express = require('express')
 
 const router = express.Router() //skapar en router för användar url:er

@@ -1,3 +1,7 @@
+/**
+ * Notification model. Tells a user (recipient) about an event on one of their questions.
+ * Only the 'answer' type is created so far; 'upvote' and 'accepted' are reserved.
+ */
 const mongoose = require('mongoose')
 
 const notificationSchema = new mongoose.Schema(

@@ -1,3 +1,7 @@
+/**
+ * Connects Mongoose to MongoDB using MONGODB_URI from server/.env.
+ * Exits the process if the variable is missing or the connection fails.
+ */
 const mongoose = require('mongoose')
 
 // ansluter till MongoDB med adressen i MONGODB_URI (från server/.env)

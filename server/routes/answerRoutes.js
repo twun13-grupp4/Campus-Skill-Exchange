@@ -1,3 +1,7 @@
+/**
+ * Routes for /api/answers.
+ * Creating and listing answers lives under /api/questions/:id/answers.
+ */
 const express = require('express')
 
 const router = express.Router()

@@ -1,3 +1,7 @@
+/**
+ * Routes for /api/questions and their answers (/api/questions/:id/answers).
+ * Reading is public; creating requires login; deleting requires the author or a moderator.
+ */
 const express = require('express')
 
 const router = express.Router()

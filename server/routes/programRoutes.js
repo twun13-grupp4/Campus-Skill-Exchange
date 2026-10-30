@@ -1,3 +1,6 @@
+/**
+ * Routes for /api/programs (public).
+ */
 const express = require('express')
 
 const router = express.Router()

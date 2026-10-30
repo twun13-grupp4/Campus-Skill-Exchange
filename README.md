@@ -13,6 +13,13 @@ MERN app split into two separate projects:
 - `client/` — React (Vite) frontend
 - `server/` — Express + Mongoose backend
 
+## Documentation
+
+- [Design](docs/design.md) — architecture (MVC), authentication, user roles, views
+- [Database](docs/database.md) — schema diagram, collections and relations
+- [User manual](docs/user-manual.md) — how to use the app
+- [Project logs](docs/project-logs/)
+
 ## Setup & run
 
 **Client**
@@ -46,7 +53,7 @@ cd server
 npm run initdb -- --yes
 ```
 
-Wipes and reseeds the shared database (schools, programs, courses, users, questions, answers). Only run this when you actually want to reset the shared data — everyone on the team uses the same database. Seeded logins (password is the same for all of them):
+Wipes and reseeds the shared database (schools, programs, courses, users, questions, answers, notifications). Only run this when you actually want to reset the shared data — everyone on the team uses the same database. Seeded logins (password is the same for all of them):
 
 | Email | Password | Role |
 |---|---|---|
@@ -76,6 +83,7 @@ On a host like Render, use `npm run build` as the build command and `npm start` 
 | POST | `/api/users/register` | – | Create an account |
 | POST | `/api/users/login` | – | Log in, returns a JWT |
 | GET | `/api/users/me` | ✓ | Current user's profile |
+| PATCH | `/api/users/me` | ✓ | Update name, school and program |
 | GET | `/api/schools` | – | List schools |
 | GET | `/api/programs?school=<id>` | – | List programs, optionally filtered by school |
 | GET | `/api/courses?school=<id>&program=<id>` | – | List courses, optionally filtered by school and/or program |
@@ -84,7 +92,13 @@ On a host like Render, use `npm run build` as the build command and `npm start` 
 | POST | `/api/questions` | ✓ | Ask a question |
 | GET | `/api/questions/:id/answers` | – | List answers to a question |
 | POST | `/api/questions/:id/answers` | ✓ | Post an answer |
+| DELETE | `/api/questions/:id` | ✓ author/moderator | Delete a question and its answers |
+| DELETE | `/api/answers/:id` | ✓ author/moderator | Delete an answer |
+| GET | `/api/notifications` | ✓ | Your 20 newest notifications |
+| PATCH | `/api/notifications/:id/read` | ✓ | Mark a notification as read |
+
+Errors return `{ "message": "..." }` with 400 (invalid input), 401 (not logged in), 403 (not allowed) or 404 (not found).
 
 ## Usage
 
-Open the client URL above. Sign up or log in with one of the seeded accounts above, browse questions by school/program/course or search by keyword, ask a question, and answer existing ones.
+Open the client URL above. Sign up or log in with one of the seeded accounts above, browse questions by school/program/course or search by keyword, ask a question, answer existing ones, and edit your profile. See the [user manual](docs/user-manual.md) for details.

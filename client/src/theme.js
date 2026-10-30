@@ -1,3 +1,6 @@
+/**
+ * Shared Material UI theme (colors, typography and shapes) for the whole app.
+ */
 import { createTheme } from '@mui/material/styles'
 
 const theme = createTheme({

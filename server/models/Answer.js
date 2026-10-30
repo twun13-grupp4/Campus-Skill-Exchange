@@ -1,3 +1,7 @@
+/**
+ * Answer model. Posted by a user on a question.
+ * upvotes/upvotedBy are reserved for the planned upvote feature.
+ */
 const mongoose = require('mongoose')
 
 const answerSchema = new mongoose.Schema(

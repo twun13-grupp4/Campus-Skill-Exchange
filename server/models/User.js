@@ -1,3 +1,8 @@
+/**
+ * User model. Belongs to one school and one program at that school.
+ * The password is hashed before saving and never returned in queries (select: false).
+ * role decides permissions: student (default), teacher or moderator.
+ */
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 

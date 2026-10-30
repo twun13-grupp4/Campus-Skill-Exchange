@@ -7,20 +7,21 @@ const Course = require('./models/Course')
 const User = require('./models/User')
 const Question = require('./models/Question')
 const Answer = require('./models/Answer')
+const Notification = require('./models/Notification')
 
 // ett datum några dagar bakåt, så frågorna inte får exakt samma tid
 const daysAgo = (days) => new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
 /**
  * Fyller databasen med testdata
- * OBS: tömmer schools, programs, courses, users, questions och answers först
+ * OBS: tömmer schools, programs, courses, users, questions, answers och notifications först
  * körs med: npm run initdb -- --yes
  */
 const initDB = async () => {
   // skyddar den delade databasen mot att tömmas av misstag
   if (!process.argv.includes('--yes')) {
     console.log(
-      'initDB clears ALL schools, programs, courses, users, questions and answers in the shared database.',
+      'initDB clears ALL schools, programs, courses, users, questions, answers and notifications in the shared database.',
     )
     console.log('Run it with: npm run initdb -- --yes')
     return
@@ -29,6 +30,7 @@ const initDB = async () => {
   await connectDB() //anslut till database
 
   // töm allt så vi börjar från noll
+  await Notification.deleteMany()
   await Answer.deleteMany()
   await Question.deleteMany()
   await User.deleteMany()

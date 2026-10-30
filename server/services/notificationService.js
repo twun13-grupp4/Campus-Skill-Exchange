@@ -26,7 +26,8 @@ const listNotifications = async (user) => {
     .limit(20)
     .populate('question', 'title') //frågans titel så navbaren kan visa den
     .lean()
-  return notifications.map(toPublicNotification)
+  //question = null om frågan är borttagen, visa inte de notiserna
+  return notifications.filter((n) => n.question).map(toPublicNotification)
 }
 
 /**

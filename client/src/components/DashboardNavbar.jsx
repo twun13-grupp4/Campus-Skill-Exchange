@@ -43,11 +43,16 @@ function DashboardNavbar() {
   const { user, endSession } = useAuth()
   const navigate = useNavigate()
 
-  // hämtar notiser en gång när sidan laddas
+  // hämtar notiser när sidan laddas och sedan var 30:e sekund
   useEffect(() => {
-    getNotifications()
-      .then(setNotifications)
-      .catch(() => setNotifications([])) // fel ska inte krascha navbaren
+    const fetchNotifications = () =>
+      getNotifications()
+        .then(setNotifications)
+        .catch(() => {}) // fel ska inte krascha navbaren, behåll gamla listan
+
+    fetchNotifications()
+    const interval = setInterval(fetchNotifications, 30000)
+    return () => clearInterval(interval) // sluta polla vid utloggning
   }, [])
 
   // Build the avatar initials from the logged-in user's name.

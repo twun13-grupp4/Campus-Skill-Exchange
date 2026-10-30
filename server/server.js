@@ -1,4 +1,6 @@
 require('dotenv/config') // läser in variablerna från .env till process.env
+const fs = require('fs')
+const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const connectDB = require('./config/db')
@@ -21,6 +23,19 @@ app.use('/api/programs', programRoutes)
 
 const courseRoutes = require('./routes/courseRoutes') //kurser, kan filtreras på skola
 app.use('/api/courses', courseRoutes)
+
+// okända /api-anrop ska ge JSON 404, inte index.html
+app.use('/api', (req, res) => res.status(404).json({ message: 'Not found' }))
+
+// serverar den byggda klienten om den finns (efter npm run build)
+const clientDist = path.join(__dirname, '../client/dist')
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist))
+  // alla andra GET ger index.html så React Router hanterar refresh/deep links
+  app.get('/{*splat}', (req, res) =>
+    res.sendFile(path.join(clientDist, 'index.html')),
+  )
+}
 
 const PORT = process.env.PORT || 3000 //http://localhost:3000
 

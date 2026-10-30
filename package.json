@@ -1,0 +1,10 @@
+{
+  "name": "campus-skill-exchange",
+  "private": true,
+  "description": "Build and run client + server with a single command",
+  "scripts": {
+    "build": "npm ci --prefix client && npm run build --prefix client && npm ci --prefix server",
+    "start": "npm start --prefix server",
+    "deploy": "npm run build && npm start"
+  }
+}

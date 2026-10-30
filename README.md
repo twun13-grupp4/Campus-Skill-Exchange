@@ -24,7 +24,7 @@ npm run dev      # development
 npm run build    # production build (output in client/dist)
 ```
 
-Runs at http://localhost:5173
+Runs at http://localhost:5173 (API calls to `/api` are proxied to the server, so start the server too)
 
 **Server**
 
@@ -55,6 +55,18 @@ Wipes and reseeds the shared database (schools, programs, courses, users, questi
 | sara@test.se | password123 | teacher |
 | omar@test.se | password123 | student |
 | lina@test.se | password123 | student |
+
+## Deploy
+
+From the project root, with `server/.env` in place:
+
+```bash
+npm run deploy
+```
+
+Installs dependencies, builds the client and starts the server, which serves both the API and the built client at http://localhost:3000 (or `PORT`). Any route can be refreshed or deep-linked.
+
+On a host like Render, use `npm run build` as the build command and `npm start` as the start command, and set `MONGODB_URI` and `JWT_SECRET` as environment variables.
 
 ## API endpoints
 

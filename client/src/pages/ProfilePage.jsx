@@ -1,29 +1,36 @@
-import { Navigate } from "react-router-dom";
-import { Chip,  Container, Paper, Stack, SvgIcon, Typography } from "@mui/material";
-import { useAuth } from'../AuthContext'
+import { Navigate } from 'react-router-dom'
+import {
+  Chip,
+  Container,
+  Paper,
+  Stack,
+  SvgIcon,
+  Typography,
+} from '@mui/material'
+import { useAuth } from '../AuthContext'
 
 /** Graduation-cap icon, used next to the user's school. */
 function SchoolIcon(props) {
-    return (
-        <SvgIcon {...props}>
-        <path
-            d="M12 3 1 9l11 6 9-4.91V17h2V9z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M5 13.18v4.72c0 1 3 3 7 3s7-2 7-3v-4.72"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        </SvgIcon>
-    )
+  return (
+    <SvgIcon {...props}>
+      <path
+        d="M12 3 1 9l11 6 9-4.91V17h2V9z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 13.18v4.72c0 1 3 3 7 3s7-2 7-3v-4.72"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </SvgIcon>
+  )
 }
 
 /** Envelope icon, used next to the user's email. */

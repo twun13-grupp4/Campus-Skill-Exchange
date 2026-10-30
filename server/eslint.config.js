@@ -13,4 +13,11 @@ module.exports = defineConfig([
       globals: globals.node,
     },
   },
+  {
+    // Jest-globaler (describe, test, expect ...) i testfilerna
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: globals.jest,
+    },
+  },
 ])

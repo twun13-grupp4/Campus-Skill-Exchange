@@ -31,10 +31,10 @@ function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      // Share the authenticated user before opening the dashboard.
+      // Share the authenticated user before opening the homepage.
       const user = await login(email, password)
       startSession(user)
-      navigate('/dashboard')
+      navigate('/')
     } catch (submitError) {
       setError(getErrorMessage(submitError))
     } finally {

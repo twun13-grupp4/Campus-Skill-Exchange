@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './AuthContext'
 import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
@@ -24,7 +24,7 @@ import ProfilePage from './pages/ProfilePage'
  * Connection errors show a retry option instead of assuming logout.
  */
 function AppContent() {
-  const { isLoading, authError } = useAuth()
+  const { isLoading, authError, user } = useAuth()
 
   if (isLoading) {
     return (
@@ -54,12 +54,14 @@ function AppContent() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        {/* Same homepage for everyone; logged-in users also get the welcome message. */}
+        <Route path="/" element={user ? <DashboardPage /> : <HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/questions/:id" element={<QuestionDetailPage />} />
         <Route path="/ask" element={<AskQuestionPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        {/* Old dashboard URL, sends to the homepage so old links still work. */}
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

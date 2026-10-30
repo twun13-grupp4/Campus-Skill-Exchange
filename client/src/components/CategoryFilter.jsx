@@ -3,6 +3,13 @@ import { Alert, Autocomplete, Button, Stack, TextField } from '@mui/material'
 import { getSchools, getPrograms, getCourses } from '../api/schools'
 import { getErrorMessage } from '../api/client'
 
+/**
+ * Lets a user narrow questions by school, program, and course.
+ * All three are independent and optional - picking one is never required
+ * before the others, though picking a school/program narrows the lower
+ * dropdowns' options. Reports the current selection to the parent via
+ * onChange; fetching questions with it is the parent's job.
+ */
 function CategoryFilter({ onChange }) {
   const [schools, setSchools] = useState([])
   const [programs, setPrograms] = useState([])

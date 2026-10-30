@@ -4,9 +4,10 @@ import { clearToken, getToken } from './token'
 /**
  * Gemensamma Axios-instans som alla API-anrop går via
  * baseURL gör att vi bara skrivet t.ex '/questions istället för hela adressen
+ * relativ '/api' funkar både i produktion (samma server) och i dev (Vite-proxy)
  */
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL ?? '/api',
 })
 
 //körs före VARJE anrop, samt lägger på token om man är inloggad

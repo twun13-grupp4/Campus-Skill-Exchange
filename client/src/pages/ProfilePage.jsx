@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { Chip,  Container, Paper, Stack, SvgIcon, Typography } from "@mui/material";
 import { useAuth } from'../AuthContext'
 
+/** Graduation-cap icon, used next to the user's school. */
 function SchoolIcon(props) {
     return (
         <SvgIcon {...props}>
@@ -25,6 +26,7 @@ function SchoolIcon(props) {
     )
 }
 
+/** Envelope icon, used next to the user's email. */
 function MailIcon(props) {
   return (
     <SvgIcon {...props}>

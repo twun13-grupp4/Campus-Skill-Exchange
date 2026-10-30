@@ -1,6 +1,10 @@
 import { Card, CardActionArea, CardContent, Chip, Stack, Typography } from "@mui/material"
 import {Link as RouterLink} from 'react-router-dom'
 
+/**
+ * Summary card for one question in a list - course, status, title,
+ * description preview, and author/date. Links to the full question page.
+ */
 function QuestionCard({question}) {
     const isAnswered = question.status === 'answered'
     // course/author are populated objects now, and may be null if deleted

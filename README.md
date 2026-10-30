@@ -73,7 +73,7 @@ cd server
 npm test
 ```
 
-The tests run against a temporary in-memory MongoDB (`mongodb-memory-server`), so they never touch the shared database and need no `.env`. The first run downloads a MongoDB binary. They also run in CI on every pull request.
+The tests run against a temporary in-memory MongoDB (`mongodb-memory-server-core`), so they never touch the shared database and need no `.env`. The first run downloads a MongoDB binary. They also run in CI on every pull request.
 
 They cover the core features end to end through the API: registration and login, listing/filtering/searching and asking questions, answering and the notifications it creates, profile editing, and the delete permissions (author vs. other user vs. moderator).
 

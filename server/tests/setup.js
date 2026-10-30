@@ -5,7 +5,8 @@
  */
 const os = require('os')
 const mongoose = require('mongoose')
-const { MongoMemoryServer } = require('mongodb-memory-server')
+// -core = utan postinstall, så MongoDB laddas bara ner när testerna körs, inte vid npm install
+const { MongoMemoryServer } = require('mongodb-memory-server-core')
 
 process.env.JWT_SECRET = 'test-secret'
 

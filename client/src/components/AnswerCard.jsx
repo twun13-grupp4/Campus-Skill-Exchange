@@ -1,7 +1,8 @@
 import { Avatar, Paper, Stack, Typography } from "@mui/material"
 
-/* Displays one answer's author, date, upvotes and description */
-
+/**
+ * Displays one answer's author, date, upvotes, and description.
+ */
 function AnswerCard({ answer }) {
     const authorName = answer.author?.name ?? 'Deleted user'
 

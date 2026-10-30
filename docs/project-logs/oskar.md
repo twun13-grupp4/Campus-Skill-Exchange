@@ -22,16 +22,21 @@
 - Added a Sign Up button to the navbar.
 - Login and signup were UI-only at this stage and were not yet connected to the backend.
 
-## Week 7 – 12 October
+## Week 7 – 12 - 18 October
 - Improved the layout of the question detail page.
-- Redesigned the question detail page UI.
 - Created the dashboard UI for logged-in users.
 - Added a separate dashboard navbar.
-- Added mock data to the dashboard as a temporary solution until it is connected to the backend.
+- Initially used mock data for the dashboard.
+- Connected the signup page to the backend registration API.
+- Connected the navbar and dashboard to the authentication state.
+- Connected question searching to the backend using MongoDB text search.
+- Added an answer submission form to the question detail page and connected it to the backend.
+- Created a website logo and a reusable Logo component for the navigation bars.
+- Added documentation comments to the question detail page.
+- Created and maintained my individual project log.
 
-## Next steps
-- Connect the login and signup pages to the backend API.
-- Add login/logout state to the navbar.
-- Replace mock dashboard data with real data from the backend.
-- Connect the question list and question detail pages to real data.
-- Connect the search functionality to the backend.
+## Week 9 - 30 October
+- Reviewed my previous commits and frontend contributions.
+- Added and improved documentation comments in the frontend files I worked on.
+- Updated my project log to reflect previously completed functionality and recent documentation work.
+

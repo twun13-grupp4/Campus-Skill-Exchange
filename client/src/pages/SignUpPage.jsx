@@ -17,6 +17,13 @@ import {
   TextField,
 } from '@mui/material'
 
+
+/**
+ * Displays the registration form for new users.
+ * Loads available schools and programs from the backend.
+ * Handles account creation and starts a session after successful registration.
+ */
+
 function SignUpPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -74,6 +81,13 @@ function SignUpPage() {
       ignore = true
     }
   }, [])
+
+
+  /**
+ * Updates the selected school and resets the program selection.
+ * This prevents users from selecting a program that is not
+ * available at their newly selected school.
+ */
 
   const handleSchoolChange = (event) => {
     setSchool(event.target.value)

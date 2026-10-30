@@ -35,3 +35,12 @@ export const getCurrentUser = async () => {
   const response = await client.get('/users/me')
   return response.data
 }
+
+/**
+ * PATCH /users/me
+ * Updates name/school/program and returns the updated user.
+ */
+export const updateCurrentUser = async (data) => {
+  const response = await client.patch('/users/me', data)
+  return response.data
+}

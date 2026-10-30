@@ -114,4 +114,41 @@ const getCurrentUser = async (req, res) => {
   }
 }
 
-module.exports = { registerUser, loginUser, getCurrentUser }
+/**
+ * PATCH /api/users/me
+ * Updates the logged-in user's name, school, and program.
+ * Role and email can't be changed here.
+ */
+const updateCurrentUser = async (req, res) => {
+  try {
+    const { name, school, program } = req.body
+
+    if (!(await isValidSchoolProgram(school, program))) {
+      return res.status(400).json({ message: 'Invalid school or program' })
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, school, program },
+      { new: true, runValidators: true, context: 'query' },
+    ).populate([
+      { path: 'school', select: 'name' },
+      { path: 'program', select: 'name' },
+    ])
+
+    res.json(toPublicUser(user))
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: error.message })
+    }
+    console.error(error)
+    res.status(500).json({ message: 'Could not update your profile' })
+  }
+}
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  updateCurrentUser,
+}

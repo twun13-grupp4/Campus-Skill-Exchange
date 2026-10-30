@@ -71,8 +71,8 @@ function DashboardNavbar() {
     >
       <Container maxWidth="lg">
         <Toolbar disableGutters sx={{ minHeight: 76 }}>
-          {/* Return to the logged-in homepage. */}
-          <Logo to="/dashboard" />
+          {/* Return to the homepage. */}
+          <Logo to="/" />
 
           <Stack
             direction="row"

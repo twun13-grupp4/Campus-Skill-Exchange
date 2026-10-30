@@ -24,6 +24,8 @@ app.use('/api/programs', programRoutes)
 const courseRoutes = require('./routes/courseRoutes') //kurser, kan filtreras på skola
 app.use('/api/courses', courseRoutes)
 
+const notificationRoutes = require('./routes/notificationRoutes') //notiser, kräver inloggning
+app.use('/api/notifications', notificationRoutes)
 const answerRoutes = require('./routes/answerRoutes') //svar, bara DELETE just nu
 app.use('/api/answers', answerRoutes)
 

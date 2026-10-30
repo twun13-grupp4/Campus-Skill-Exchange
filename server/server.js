@@ -24,6 +24,9 @@ app.use('/api/programs', programRoutes)
 const courseRoutes = require('./routes/courseRoutes') //kurser, kan filtreras på skola
 app.use('/api/courses', courseRoutes)
 
+const answerRoutes = require('./routes/answerRoutes') //svar, bara DELETE just nu
+app.use('/api/answers', answerRoutes)
+
 // okända /api-anrop ska ge JSON 404, inte index.html
 app.use('/api', (req, res) => res.status(404).json({ message: 'Not found' }))
 

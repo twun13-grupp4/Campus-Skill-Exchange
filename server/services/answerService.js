@@ -60,4 +60,18 @@ const createAnswer = async (questionId, description, user) => {
   return toPublicAnswer(answer)
 }
 
-module.exports = { listAnswers, createAnswer }
+/**
+ * Just the author id of an answer, for the delete permission check in
+ * requireOwnerOrModerator.
+ */
+const getAnswerAuthor = (id) => Answer.findById(id).select('author')
+
+/**
+ * Deletes an answer. Permission (author or moderator) is already checked
+ * by requireOwnerOrModerator before this runs.
+ */
+const deleteAnswer = async (id) => {
+  await Answer.findByIdAndDelete(id)
+}
+
+module.exports = { listAnswers, createAnswer, getAnswerAuthor, deleteAnswer }

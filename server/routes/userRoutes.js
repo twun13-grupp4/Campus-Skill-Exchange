@@ -6,6 +6,7 @@ const {
   registerUser,
   loginUser,
   getCurrentUser,
+  updateCurrentUser,
 } = require('../controllers/userController') //hämtar funktioner
 
 const requireAuth = require('../middleware/requireAuth')
@@ -18,5 +19,8 @@ router.post('/login', loginUser)
 
 // Return the current user's profile only when their token is valid.
 router.get('/me', requireAuth, getCurrentUser)
+
+// Update the logged-in user's name/school/program.
+router.patch('/me', requireAuth, updateCurrentUser)
 
 module.exports = router
